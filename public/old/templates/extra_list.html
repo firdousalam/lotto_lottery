@@ -1,0 +1,178 @@
+<div class="col-lg-12"  ng-controller="extra" ng-cloak>
+	<div class="row row-centered">
+		<div class="col-lg-6 col-centered" style="margin-top:16px; min-height:750px;">
+		<div class="panel panel-green margin-bottom-10">
+			<!-- heading   -->
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-tasks"></i> Extra List
+					<!--<button type="button" ng-click="openAddExtra()" class="btn btn-default btn-xs pull-right"><i class="fa fa-plus-square"></i> Add Extra</button>-->
+				</h3>
+			</div><!--end of heading   -->		
+			<!-- div  for searching-->
+			<div class="panel-body text-center">
+				<div class="col-sm-4 col-sm-offset-4">
+					<div id="imaginary_container">
+						<div class="input-group stylish-input-group">
+							<input type="text" class="form-control"  ng-model="search" placeholder="Search" >
+							<span class="input-group-addon">
+								<button type="submit"> <span class="glyphicon glyphicon-search"></span> </button>
+							</span> 
+						</div>
+					</div>
+				</div>
+			</div><!-- end for searching-->		
+			<!-- start of main table div all table should be within this div -->
+			<div class="table-responsive">		
+				<!-- start of main table  all data should be place here -->
+				<table  class="table table-striped table-bordered table-hover">
+					<!-- start of main table HEADING-->
+					<thead>
+						<tr>
+							<!--  header of the table and the field by which we like to do sorting -->
+							<th style="width:50%" ng-click="sortExtraTableBy('name')">Extra Name&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+							<th style="width:25%" ng-click="sortExtraTableBy('price')">Extra Price&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='price'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='price'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+							<th style="width:25%">Action </th>
+						</tr>
+					</thead><!-- end of main table HEADING-->				
+					<tbody ng-hide="extraRes">
+						<tr>
+							<td colspan="3"><div ng-show="extraLoader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div></td>
+						</tr>
+					</tbody>
+					<tbody ng-show="extraRes">				
+						<!--  dir-paginate directive will add dom which will go for pagination -->
+						<tr dir-paginate="extra in car_extra_listing_data|orderBy:sortKey:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+							<tr><td colspan="3" ng-show="!car_extra_listing_data.length" style="align:center"><b>No Data Available.</b></td></tr>
+							<!--  user details are showing from here using ng-repeat-start  and make searching and sorting etc-->
+							<tr ng-repeat="extra in car_extra_listing_data|orderBy:sort_table:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+								<td>{{::extra.name}}</td>
+								<td align="right">{{currency}}&nbsp;{{::extra.price | currency : ''}}</td>
+								<td ng-init="customer_array_index =$index" class="width-200">
+									<!-- button to edit -->
+									<button type="button" class="btn btn-warning btn-xs" ng-click="openEditExtra(extra);"><i class="fa fa-pencil"></i> Edit</button>
+									&nbsp;
+									<!-- button to delete 
+									<button class="btn btn-danger btn-xs" ng-click="deleteExtras(extra._id);" ng-confirm-click="Are you sure you want to delete?"><i class="fa fa-trash-o"></i> Delete</button>-->
+								</td>
+							</tr>
+						</tr>
+						<!-- the below Dom will show the details of the user i.e to show second layer (array of an array) using ng-repeat-end  -->															
+					</tbody><!--end of main tbody -->		
+				</table><!-- end of main table-->			
+			</div><!-- end of main table div> -->		
+		</div><!-- end of main panel-->	
+		<div class="pull-left">
+			<div class="dataTables_length" id="dataTables-example_length">
+				<div class="bms-form" style="border:0;">
+					<label>Show</label>
+					<label class="select">
+						<select ng-model="selected_search_type_per_page" 
+										ng-options="search.value as search.name for search in page_per_pagination" 
+										ng-init="selected_search_type_per_page=selected_page_pagination">
+											<option value="">Select no of rows</option>
+						</select>
+						<i></i>
+					</label>
+				</div>
+			</div>
+		</div>
+		<ul class="pagination pull-right">
+			<dir-pagination-controls
+									max-size="5"
+									direction-links="true"
+									boundary-links="true" >
+			</dir-pagination-controls>
+		</ul>	
+		<!-- below model will open the form to add new extra-->
+		<modal title="Add Extra" visible="add_car_extra_modal">
+			<div class="bms-form noBorder">
+				<form  name="extraForm" ng-submit="addExtra(extraForm.$valid)" novalidate>
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<label for="name">Extra Name <span style="color:red;">*</span> :</label>
+							<label class="input">
+								<input type="text" name="name" ng-model="add_new_extra.name" required>
+							</label>
+							<div class="error" ng-show="extraForm.name.$touched || name" ng-messages="extraForm.name.$error"> 
+								<p ng-message="required">Please enter extra name.</p>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<label for="name">Extra Price <span style="color:red;">*</span> :</label>
+							<label class="input">
+								<input type="number" name="price" ng-model="add_new_extra.price" required>
+							</label>
+							<div class="error" ng-show="extraForm.price.$touched || price" ng-messages="extraForm.price.$error"> 
+								<p ng-message="required">Please enter extra price.</p>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+							<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+							<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</modal>
+		<!-- below model will open the form to edit extra-->
+		<modal title="Edit Extra" visible="edit_car_extra_modal">
+			<div class="bms-form noBorder">
+				<form  name="extraForm" ng-submit="editExtra(extraForm.$valid)" novalidate>
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<label for="name">Extra Name <span style="color:red;">*</span> :</label>
+							<label class="input">
+								<input type="text" name="name" ng-model="edit_extra.name" required>
+							</label>
+							<div class="error" ng-show="extraForm.name.$touched || name" ng-messages="extraForm.name.$error"> 
+								<p ng-message="required">Please enter extra name.</p>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<label for="name">Extra Price <span style="color:red;">*</span> :</label>
+							<label class="input">
+								<input type="number" name="price" ng-model="edit_extra.price" required>
+							</label>
+							<div class="error" ng-show="extraForm.price.$touched || price" ng-messages="extraForm.price.$error"> 
+								<p ng-message="required">Please enter extra price.</p>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+						<div class="modal-footer" >
+							<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+							<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+							<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</modal>
+		<!-- below model will open the messages. -->
+		<modal visible="success_error_message">
+			<section id="contact-page">
+				<div class="">
+					<div class="alert alert-success" role="alert" ng-if="alert_message_success">
+						<strong>Success!</strong>&nbsp;{{alert_message_success}}
+					</div>
+					<!--<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>-->
+				</div>
+			</section>
+		</modal>
+	</div><!-- end of main container -->
+	</div>
+</div>
+<div class="clearfix"></div>

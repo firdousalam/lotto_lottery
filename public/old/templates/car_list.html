@@ -1,0 +1,479 @@
+<div class="row" ng-cloak>
+	<div class="col-lg-12" style="margin-top:16px; min-height:750px;" ng-controller="car">
+	<div class="panel panel-green margin-bottom-10">
+		<div class="panel-heading">
+			<h3 class="panel-title"><i class="fa fa-tasks"></i> Cars Details
+				<button type="button" ng-click="openAddNewCar()" class="btn btn-default btn-xs pull-right"><i class="fa fa-plus-square"></i> Add New Car</button>
+			</h3>
+		</div>
+		<div class="panel-body text-center">
+			<div class="col-sm-4 col-sm-offset-4">
+				<div id="imaginary_container">
+					<div class="input-group stylish-input-group">
+						<input type="text" class="form-control"  ng-model="search" placeholder="Search" >
+						<span class="input-group-addon">
+							<button type="submit"> <span class="glyphicon glyphicon-search"></span> </button>
+						</span> 
+					</div>
+				</div>
+			</div>
+		</div><!-- end for searching-->		
+		<div class="table-responsive">	
+			<table class="table table-striped table-bordered table-hover">
+				<thead>
+					<tr>
+					<!--  header of the table and the field by which we like to do sorting -->
+						<th>Extras</th>
+						<th ng-click="sortCarTableBy('car_class')" style="width:7%">Car Class&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='car_class'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='car_class'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('order_id')">Order Id&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='order_id'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='order_id'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('description')">Car Description&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th>Car Image</th>
+						<th ng-click="sortCarTableBy('distance_fare')">Distance Fare&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='distance_fare'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='distance_fare'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('minimum_fare')">Minimum Fare&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='minimum_fare'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='minimum_fare'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('hourly_fare')">Hourly Fare&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='hourly_fare'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='hourly_fare'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('minimum_number_of_hours')">Minimum No.of Hours&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='minimum_number_of_hours'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='minimum_number_of_hours'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('per_min_waiting_charges')">Waiting Charge(Per Minute)&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='per_min_waiting_charges'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='per_min_waiting_charges'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th ng-click="sortCarTableBy('maximum_suitcases')">Associated Service Types&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='maximum_suitcases'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='maximum_suitcases'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+						<th class="width-200">Action </th>
+					</tr>
+				</thead><!-- end of main table HEADING-->				
+				<tbody ng-hide="carRes">
+					<tr>
+						<td colspan="12"><div ng-show="carLoader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div></td>
+					</tr>
+				</tbody>
+				<tbody ng-show="carRes">				
+					<!--  dir-paginate directive will add dom which will go for pagination -->
+					<tr dir-paginate="cars in car_listing_data|orderBy:sortKey:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+						<tr><td colspan="12" ng-show="!car_listing_data.length" style="align:center"><b>No Data Available.</b></td></tr>
+						<!--  user details are showing from here using ng-repeat-start  and make searching and sorting etc-->
+						<tr ng-repeat-start="cars in car_listing_data|orderBy:sort_table:reverse|orderBy:'order_id'|filter:search|itemsPerPage:selected_search_type_per_page">
+							<td><button class="btn btn-info btn-xs" ng-click="showDetails = ! showDetails"><i class="fa fa-list-alt"></i></button></td>
+							<td><strong>{{::cars.car_class}}</strong></td>
+							<td>{{::cars.order_id}}</td>
+							<td>{{::cars.description}}</td>
+							<td><img ng-src="{{cars.image.image_path}}" class="img-thumbnail" style="height:100 px ; width:200px" src="{{cars.image.image_path}}"></td>
+							<td align="right">{{currency}}&nbsp;{{::cars.distance_fare | currency : ''}}</td>
+							<td align="right">{{currency}}&nbsp;{{::cars.minimum_fare | currency : ''}}</td>
+							<td align="right">{{currency}}&nbsp;{{::cars.hourly_fare | currency : ''}}</td>
+							<td align="right">{{::cars.minimum_number_of_hours}}</td>
+							<td align="right">{{currency}}&nbsp;{{::cars.per_min_waiting_charges | currency : ''}}</td>
+							<td>Passenger Capacity : {{::cars.maximum_passengers}}<br>Suitcase Capacity : {{::cars.maximum_suitcases}}</td>
+							<td ng-init="customer_array_index =$index" class="width-200">
+								<!-- button to edit -->
+								<button type="button" class="btn btn-warning btn-xs" ng-click="openEditCar(cars)"><i class="fa fa-pencil"></i> Edit</button>
+								&nbsp;
+								<!-- button to view detail and  showDetails = ! showDetails will open the details view where we will write ng-show=showDetails-->								
+							</td>
+						</tr>
+					</tr>
+					<!-- the below Dom will show the details of the user i.e to show second layer (array of an array) using ng-repeat-end  -->
+					<tr ng-show="showDetails" ng-repeat-end>
+						<td colspan="12" class="mainBlocktable">
+							<div class="panel panel-green margin-bottom-30 greenBlock" style="border-right:0;"><span class="listingArrow"><img src="http://www.limokit.com/bms_clients/repo/images/listing-arrow.png" alt=""/></span>
+								<div class="panel-heading">
+									<h3 class="panel-title"><i class="fa fa-user"></i> Car Extras
+										<button class="btn btn-default btn-xs pull-right" ng-click="openAddNewExtraToCar(cars._id);"><i class="fa fa-plus-square"></i>Add</button>
+									</h3>
+								</div>
+								<div class="table-responsive">
+									<table class="table">
+										<thead>
+											<tr class="active">
+												<th>Extra Name</th>
+												<th>Price</th>
+												<th class="width-200">Action</th>
+											</tr>
+										</thead>
+										<tbody>
+										<!-- this div is used to show details of car (second level type data)	-->	
+											<tr><td colspan="3" ng-show="!cars.extras.length" style="align:center"><b>No Data Available.</td></td></tr>
+											<tr ng-repeat="extras in cars.extras" >
+												<td>{{::extras.name}}</td>
+												<td>{{currency}}&nbsp;{{::extras.price | currency : ''}}</td>
+												<td>
+													<button type="button" class="btn btn-warning btn-xs" ng-click="openEditCarExtra(cars._id, extras._id, extras);"><i class="fa fa-pencil"></i> Edit</button>
+													&nbsp;
+													<button class="btn btn-danger btn-xs" ng-click="deleteCarExtra(cars._id, extras._id);" ng-confirm-click="Are you sure you want to delete?"><i class="fa fa-trash-o"></i> Delete</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</tbody><!--end of main tbody -->				
+			</table><!-- end of main table-->			
+		</div><!-- end of main table div> -->		
+	</div><!-- end of main panel-->	
+	<div class="pull-left">
+		<div class="dataTables_length" id="dataTables-example_length">
+			<div class="bms-form" style="border:0;">
+				<label>Show</label>
+				<label class="select">
+					<select ng-model="selected_search_type_per_page" 
+									ng-options="search.value as search.name for search in page_per_pagination" 
+									ng-init="selected_search_type_per_page=selected_page_pagination">
+										<option value="">Select no of rows</option>
+					</select>
+					<i></i>
+				</label>
+			</div>
+		</div>
+	</div>
+	<ul class="pagination pull-right">
+		<dir-pagination-controls
+								max-size="1"
+								direction-links="true"
+								boundary-links="true" >
+		</dir-pagination-controls>
+	</ul>	
+	<!-- below model will open the form to add new car-->
+	<modal title="Add New Car" visible="add_car_modal">
+	<div class="bms-form noBorder">
+		<form name="addCar" ng-submit="addNewCar(addCar.$valid)" enctype="multipart/form-data" novalidate>
+			<div class="row">
+				<div class="col-xs-12 col-md-12">
+					<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="name">Enter Car Class <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.car_class" name="car_class" required>
+					</label>
+					<div class="error" ng-show="addCar.car_class.$touched || car_class"  ng-messages="addCar.car_class.$error">
+						<p ng-message="required">Please enter car class.</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="name">Order Id <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.order_id" name="order_id" required>
+					</label>
+					<div class="error" ng-show="addCar.order_id.$touched || order_id"  ng-messages="addCar.order_id.$error">
+						<p ng-message="required">Please enter order id.</p>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<label for="pwd">Description <span style="color:red;">*</span> :</label>
+					<label class="textarea">
+						<textarea rows="3" ng-model="add_new_car.description" name="description" required></textarea>
+					</label>
+					<div class="error" ng-show="addCar.description.$touched || description"  ng-messages="addCar.description.$error">
+						<p ng-message="required">Please enter a description.</p>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<label for="name">Car Image </label>
+					<!---->
+					<label class="input input-file" for="file">
+						<!--<div class="button"><input type="file" ng-model="add_new_car.image_name"  onchange="this.parentNode.nextSibling.value = this.value" id="file">Browse</div><input type="text" readonly="">-->
+						<file name="image" ng-model="add_new_car.image_name"  />
+					</label>
+				</div>
+				<div class="col-md-6">
+					<label for="pwd">Base Fare (<strong>{{currency}}<strong>) <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.distance_fare" name="distance_fare" required>
+					</label>
+					<div class="error" ng-show="addCar.distance_fare.$touched || distance_fare"  ng-messages="addCar.distance_fare.$error">
+						<p ng-message="required">Please enter base fare.</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="pwd">Minimum Fare (<strong>{{currency}}<strong>) <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.minimum_fare" name="minimum_fare" required>
+					</label>
+					<div class="error" ng-show="addCar.minimum_fare.$touched || minimum_fare"  ng-messages="addCar.minimum_fare.$error">
+						<p ng-message="required">Please enter minimum fare.</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="pwd">Waiting Fare(Per minute) (<strong>{{currency}}<strong>) <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.per_min_waiting_charges" name="per_min_waiting_charges" required>
+					</label>
+					<div class="error" ng-show="addCar.per_min_waiting_charges.$touched || per_min_waiting_charges"  ng-messages="addCar.per_min_waiting_charges.$error">
+						<p ng-message="required">Please enter waiting charges.</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="pwd">Hourly Fare (<strong>{{currency}}<strong>) <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.hourly_fare" name="hourly_fare" required>
+					</label>
+					<div class="error" ng-show="addCar.hourly_fare.$touched || hourly_fare"  ng-messages="addCar.hourly_fare.$error">
+						<p ng-message="required">Please enter hourly fare.</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="pwd">Minimum no. of Hours  (<strong>In Hours<strong>)<span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_new_car.minimum_number_of_hours" name="minimum_number_of_hours" required>
+					</label>
+					<div class="error" ng-show="addCar.minimum_number_of_hours.$touched || minimum_number_of_hours"  ng-messages="addCar.minimum_number_of_hours.$error">
+						<p ng-message="required">Please enter minimum hours.</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label for="pwd">No. of Passengers <span style="color:red;">*</span> :</label>
+					<label class="select">
+						<select id="sel1" ng-model="add_new_car.maximum_passengers" name="maximum_passengers" required>
+							<option value="">Select no of pax</option>
+							<option value="{{i}}" data-ng-repeat="i in range">{{i}} </option>
+						</select>
+						<i></i>
+					</label>
+					<div class="error" ng-show="addCar.maximum_passengers.$touched || maximum_passengers"  ng-messages="addCar.maximum_passengers.$error">
+						<p ng-message="required">Please select passenger capacity.</p>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="col-md-6">
+					<label for="pwd">Maximum Suitcases <span style="color:red;">*</span> :</label>
+					<label class="select">
+						<select id="sel1" ng-model="add_new_car.maximum_suitcases" name="maximum_suitcases" required>
+							<option value="">Select no of suitcases</option>
+							<option value="{{j}}" data-ng-repeat="j in range">{{j}} </option>
+						</select>
+						<i></i>
+					</label>
+					<div class="error" ng-show="addCar.maximum_suitcases.$touched || maximum_suitcases"  ng-messages="addCar.maximum_suitcases.$error">
+						<p ng-message="required">Please select suitcase capacity.</p>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="modal-footer" >
+					<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+					<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+					<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	</modal>
+	<!-- below model will open the form to Edit new car-->
+	<modal title="Edit New Car" visible="edit_car_modal">
+		<div class="bms-form noBorder">
+			<form name="editCarForm" ng-submit="editCar(editCarForm.$valid)" enctype="multipart/form-data" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="edit_new_car.id"/>
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="name">Car Class <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.car_class" name="car_class" required>
+						</label>
+						<div class="error" ng-show="editCarForm.car_class.$touched || car_class"  ng-messages="editCarForm.car_class.$error">
+							<p ng-message="required">Please enter car class.</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="name">Order Id <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.order_id" name="order_id" required>
+						</label>
+						<div class="error" ng-show="editCarForm.order_id.$touched || order_id"  ng-messages="editCarForm.order_id.$error">
+							<p ng-message="required">Please enter order id.</p>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<label for="pwd">Description <span style="color:red;">*</span> :</label>
+						<label class="textarea">
+							<textarea rows="3" ng-model="edit_new_car.description" name="description" required></textarea>
+						</label>
+						<div class="error" ng-show="editCarForm.description.$touched || description"  ng-messages="editCarForm.description.$error">
+							<p ng-message="required">Please enter a description.</p>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<label for="name">Car Image </label>
+						<!---->
+						<label class="input input-file" for="file">
+                            <!--<div class="button"><input type="file" ng-model="edit_new_car.image_name"  onchange="this.parentNode.nextSibling.value = this.value" id="file">Browse</div><input type="text" readonly="">-->
+							<file name="image" ng-model="edit_new_car.image_name"  />
+						</label>
+					</div>
+					<div class="col-md-6">
+						<label for="pwd">Base Fare <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.distance_fare" name="distance_fare" required>
+						</label>
+						<div class="error" ng-show="editCarForm.distance_fare.$touched || distance_fare"  ng-messages="editCarForm.distance_fare.$error">
+							<p ng-message="required">Please enter base fare.</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="pwd">Minimum Fare <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.minimum_fare" name="minimum_fare" required>
+						</label>
+						<div class="error" ng-show="editCarForm.minimum_fare.$touched || minimum_fare"  ng-messages="editCarForm.minimum_fare.$error">
+							<p ng-message="required">Please enter minimum fare.</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="pwd">Waiting Fare(Per minute) <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.per_min_waiting_charges" name="per_min_waiting_charges" required>
+						</label>
+						<div class="error" ng-show="editCarForm.per_min_waiting_charges.$touched || per_min_waiting_charges"  ng-messages="editCarForm.per_min_waiting_charges.$error">
+							<p ng-message="required">Please enter waiting charges.</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="pwd">Hourly Fare <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.hourly_fare" name="hourly_fare" required>
+						</label>
+						<div class="error" ng-show="editCarForm.hourly_fare.$touched || hourly_fare"  ng-messages="editCarForm.hourly_fare.$error">
+							<p ng-message="required">Please enter hourly fare.</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="pwd">Minimum number Hour <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_new_car.minimum_number_of_hours" name="minimum_number_of_hours" required>
+						</label>
+						<div class="error" ng-show="editCarForm.minimum_number_of_hours.$touched || minimum_number_of_hours"  ng-messages="editCarForm.minimum_number_of_hours.$error">
+							<p ng-message="required">Please enter minimum hours.</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label for="pwd">Passenger <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select id="sel1" ng-model="edit_new_car.maximum_passengers" name="maximum_passengers" required>
+								<option value="">Select no of pax</option>
+								<option value="{{i}}" data-ng-repeat="i in range">{{i}} </option>
+							</select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editCarForm.maximum_passengers.$touched || maximum_passengers"  ng-messages="editCarForm.maximum_passengers.$error">
+							<p ng-message="required">Please select passenger capacity.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-md-6">
+						<label for="pwd">Maximum Suitcases <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select id="sel1" ng-model="edit_new_car.maximum_suitcases" name="maximum_suitcases" required>
+								<option value="">Select no of suitcases</option>
+								<option value="{{j}}" data-ng-repeat="j in range">{{j}} </option>
+							</select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editCarForm.maximum_suitcases.$touched || maximum_suitcases"  ng-messages="editCarForm.maximum_suitcases.$error">
+							<p ng-message="required">Please select suitcase capacity.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- below model will open the form to add extra against car-->
+	<modal title="Add Extra" visible="show_add_extra_model">
+		<div class="bms-form noBorder">
+			<form role="form" name="addExtra" ng-submit="addNewExtraToCar(addExtra.$valid);" novalidate>
+			<div class="row">
+				<div class="col-xs-12 col-md-12">
+					<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>
+				</div>
+				<div class="col-md-12">
+					<label for="email">Extra Name <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" name="name" ng-model="add_extra_form.name" required>
+					</label>
+					<div class="error" ng-show="addExtra.name.$touched || name" ng-messages="addExtra.name.$error"> 
+						<p ng-message="required">Please select extra name.</p>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<label for="pwd">Enter Price <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="number" name="price"  ng-model="add_extra_form.price" required>
+					</label>
+					<div class="error" ng-show="addExtra.price.$touched || price" ng-messages="addExtra.price.$error"> 
+						<p ng-message="required">Please enter extra price.</p>
+					</div>
+				</div>			
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+					<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+					<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+				</div>
+			</div>	
+
+			</form>
+		</div>
+	</modal>
+	<!-- below model will open the form to extra extra against car-->
+	<modal title="Extra" visible="show_edit_extra_model">
+		<div class="bms-form noBorder">
+			<form role="form" name="addExtra" ng-submit="editCarExtra(addExtra.$valid);" novalidate>
+			<div class="row">
+				<div class="col-xs-12 col-md-12">
+					<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>
+				</div>
+				<div class="col-md-12">
+					<label for="email">Extra Name <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" name="name"  ng-model="edit_extra_form.name" required>
+					</label>
+					<div class="error" ng-show="addExtra.name.$touched || name" ng-messages="addExtra.name.$error"> 
+						<p ng-message="required">Please select extra name.</p>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<label for="pwd">Enter Price <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="number" name="price" ng-model="edit_extra_form.price" required>
+					</label>
+					<div class="error" ng-show="addExtra.price.$touched || price" ng-messages="addExtra.price.$error"> 
+						<p ng-message="required">Please enter extra price.</p>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+					<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+					<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+				</div>
+			</div>	
+
+			</form>
+		</div>
+	</modal>
+	<!-- below model will open the messages. -->
+	<modal visible="success_error_message">
+		<section id="contact-page">
+			<div class="">
+				<div class="alert alert-success" role="alert" ng-if="alert_message_success">
+					<strong>Success!</strong>&nbsp;{{alert_message_success}}
+				</div>
+				<!--<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+					<strong>Error!</strong>&nbsp;{{alert_message_error}}
+				</div>-->
+			</div>
+		</section>
+	</modal>
+</div><!-- end of main container -->
+</div>
+<div class="clearfix"></div>

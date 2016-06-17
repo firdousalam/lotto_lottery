@@ -1,0 +1,68 @@
+<section id="contact-page" ng-cloak>
+	<div class="container">
+		<div class="row row-centered">
+			<div class="col-md-6 col-centered login " style="margin-top:5%;">
+				<div class="panel with-nav-tabs panel-default" style="box-shadow:0">
+					<div class="panel-body">
+						<div class="tab-content">
+							<div id="tab1default" class="tab-pane fade in active">
+								<form ng-submit="generalLogin()" name="loginForm" novalidate>
+									<div class="reg-header">
+										<h2>Login to your account</h2>
+									</div>
+									<div class="alert alert-danger" ng-if="error_message" style="font-weight:bold">{{error_message}}</div>
+									<!-- Select user type during login. -->
+									<div class="input-group margin-bottom-20">
+										<span class="input-group-addon"><i class="fa fa-user"></i></span>
+										<select style="border-left:0px;" class="form-control" id="title" name="user_type" ng-model="login_form_for_user.user_type" required><!--ng-init="login_form_for_user.user_type=''"-->
+											<option style="display:none;" value="" disabled selected hidden>User type</option>
+											<option value="Admin" ng-selected="login_form_for_user.user_type == 'Admin'">Admin</option>
+											<option value="Customer" ng-selected="login_form_for_user.user_type == 'Customer'">Customer</option>
+											<option value="Driver" ng-selected="login_form_for_user.user_type == 'Driver'">Driver</option>
+										</select>
+									</div>
+									
+									<div class="error" ng-show="loginForm.user_type.$dirty && loginForm.user_type.$invalid" style="color:#F00"><p>Please select user type</p></div>
+									<!-- Enter user name during login. -->
+									<label ng-show="login_form_for_user.email" class="show-hide" style="padding-left:0; padding-right:0; font-weight:400;">User name/email</label>
+									<div class="input-group margin-bottom-20">
+										<span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+										<input type="email" style="border-left:0px;" class="form-control" name="email" placeholder="Email" ng-model="login_form_for_user.email" required>
+									</div>
+									<div class="error" ng-show="loginForm.email.$dirty && loginForm.email.$invalid" style="color: red;"><p>Please enter your email</p></div>
+									<!-- Enter user password during login. -->
+									<label ng-show="login_form_for_user.password" class="show-hide" style="padding-left:0; padding-right:0; font-weight:400;">Enter Password</label>
+									<div class="input-group margin-bottom-20">
+										<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+										<input type="password" style="border-left:0px;" class="form-control" name="password" placeholder="Password" ng-model="login_form_for_user.password" required>
+									</div>
+									<div class="error" ng-show="loginForm.password.$dirty && loginForm.password.$invalid"><p>Please enter password</p></div>
+									<div class="row">
+										<!-- Check this to stay signed in. -->
+										<div class="col-md-6 checkbox bms-form noBorder">										
+											<label class="checkbox"><input type="checkbox" ng-model="login_form_for_user.stay_signin"><i></i>Stay logged in</label>
+										</div>
+										<div class="col-md-6">
+											<div class="pull-right">
+												<span style="display:block;" ng-show="login_loader"><div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99; background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div></span>
+												<button type="submit" class="btn btn-info pull-right btn-login">Log In</button>
+											</div>
+										</div>
+									</div>
+									<hr>
+									<h4>Forgot your password?</h4>
+									<p style="padding-bottom:0;">No worries, <a href="#/forget_password" class="color-deep-blue">CLICK HERE</a> to reset password.</p>
+								</form>
+							</div>
+							<div>    
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</section>
+<script src="js/wow.min.js"></script> 
+</body>
+</html>

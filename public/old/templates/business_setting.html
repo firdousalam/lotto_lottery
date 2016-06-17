@@ -1,0 +1,1148 @@
+<div ng-controller="business_setting" ng-cloak>
+	<div class="row row-centered">
+		<div class="col-lg-6 col-xs-12 center-block col-centered" style="margin-top:16px;">
+			<div class="panel panel-green margin-bottom-10">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-gears"></i>&nbsp;&nbsp;&nbsp;Business Settings</h3>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingOne">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Edit General Business Settings
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form">
+							<fieldset>
+								<form id="main-contact-form" class="contact-form" name="general_setting_form" ng-submit="updateGeneralSettings(general_setting_form)" novalidate>
+									<div class="row">
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Business Logo:<span style="color:red;">&nbsp;*</span></label>
+											<div class="form-group text-center">
+												<img ng-src="{{general_setting.business_logo_path}}" width="100" height="auto" alt="Company Logo">
+												<div class="text-center"></div><!--{{general_setting.business_logo}}-->
+												<div ng-if="general_setting.business_logo" class="changeLogo btn btn-info btn-xs"  ng-click="showImageUploadPanel()">
+													<i class="fa fa-picture-o"></i>&nbsp;Change Logo
+												</div>
+												<div ng-if="!general_setting.business_logo" class="changeLogo btn btn-info btn-xs" ng-click="showImageUploadPanel()">
+													<i class="fa fa-picture-o"></i>&nbsp;Add Logo
+												</div>
+											</div>
+											<file style="margin:0 auto 5px;" class="browse" ng-show="upload_business_logo" name="image" ng-model="general_setting.business_logo" ng-model-options="{ updateOn: 'blur' }" ng-pattern="checkFileExtentionPattern" /><!--ng-click="checkFileExtentionPattern(general_setting.business_logo)"-->
+											<div class="error" ng-show="general_setting_form.image.$dirty && general_setting_form.image.$invalid && change_password.confirm_password.$error.required"><p>Please select business logo.</p></div>
+											<div class="error" ng-if="file_extention_error" ng-show="general_setting_form.image.$error.pattern"><p>Only  png, jpeg, jpg, gif image are allowed.</p></div>  
+											<div class="error" ng-if="file_size_error" ng-show="general_setting_form.image.$error.pattern"><p>Selected image size must be below 2 mb.</p></div>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Business Details&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Here you can adjust/view the details of your business."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Business Name:<span style="color:red;">&nbsp;*</span>&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="This name will be used for email communications and generating Invoices."></i></label>
+											<label class="input col-xs-8">
+												<input type="text" name="business_name" ng-model="general_setting.business_name" required>
+												<div class="error" ng-show="general_setting_form.business_name.$dirty && general_setting_form.business_name.$invalid" style="margin-top:5px;"><p>Please enter business name.</p></div>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Trading Name:&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Same as Business Name"></i></label>
+											<label class="input col-xs-8">
+												<input type="text" name="trading_name" ng-model="general_setting.trading_name">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.trading_name.$dirty && general_setting_form.trading_name.$invalid"><p>Please enter trading name.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Business Number:&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="This is the number used in invoices for Taxation purpose. For example, Australian Businesses would put thier ABN here."></i></label>
+											<label class="input col-xs-8">
+												<input type="text" name="business_number" ng-model="general_setting.business_number">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.business_number.$dirty && general_setting_form.business_number.$invalid"><p>Please enter business number.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Local Currency:<span style="color:red;">&nbsp;*</span>&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="This is the currency that would be used throughout the system including job prices, invoices and driver accounting."></i></label>
+											<label class="input col-xs-8">
+												<input type="text" name="currency_code" class="form-control" ng-model="currency_of_general_setting" readonly>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12" ng-if="address_setting.tax_percentage_field_name">
+											<label class="pull-left col-xs-4">{{address_setting.tax_percentage_field_name}} Percentage:
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="{{address_setting.tax_percentage_field_name}} percentage is tax percentage of this country."></i>
+											</label>
+											<label class="input col-xs-8">
+												<input type="text" name="tax_percentage" ng-model="address_setting.tax_percentage_value" ng-pattern="/^[0-9]{1,6}$/">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.tax_percentage.$dirty && general_setting_form.tax_percentage.$invalid"><p>Please enter valid {{address_setting.tax_persentage_field_name  | lowercase}} percentage.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Business Website:&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Must be of the fomat - http://www.yourdomainname.com"></i></label>
+											<label class="input col-xs-8">
+												<input type="url" name="website_domain" class="form-control" ng-model="general_setting.website_domain" required>
+											</label>
+											<!--div class="error" ng-show="general_setting_form.website_domain.$dirty && general_setting_form.website_domain.$invalid && general_setting_form.website_domain.$error.required"><p>Please enter website name.</p></div-->
+											<!--div class="error" ng-show="general_setting_form.website_domain.$error.url"><p>Sorry not a valid URL, don't forget to use http://www.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Business Slogan:&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="This is your slogan or punchline of the business. This would appear on your business, tax invoices etc."></i></label>
+											<label class="textarea col-xs-8">
+												<textarea name="business_slogan" ng-model="general_setting.bms_slogan"></textarea>
+												<!--div class="error" ng-show="general_setting_form.business_slogan.$dirty && general_setting_form.business_slogan.$invalid"><p>Please enter business slogan.</p></div-->
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Business Address&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="This Address would be used in email communications and invoices."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Line 1:</label>
+											<label class="input col-xs-8">
+												<input type="text" name="line_1" ng-model="address_setting.line_1">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.line_1.$dirty && general_setting_form.line_1.$invalid"><p>Please enter valid business address.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Line 2:</label>
+											<label class="input col-xs-8">
+												<input type="text" name="line_2" ng-model="address_setting.line_2">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.line_2.$dirty && general_setting_form.line_2.$invalid"><p>Please enter address line-2.</p>
+											</div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">						
+											<label class="pull-left col-xs-4">Suburb/ District:</label>
+											<label class="input col-xs-8">
+												<input type="text" name="suburb_district" ng-model="address_setting.suburb_district">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.suburb_district.$dirty && general_setting_form.suburb_district.$invalid"><p>Please enter address line-2.</p>
+											</div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">City:</label>
+											<label class="input col-xs-8">
+												<input type="text" name="city" ng-model="address_setting.city" ng-pattern="/^(\D)+$/">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.city.$dirty && general_setting_form.city.$invalid"><p>Please enter valid city.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">State:</label>
+											<label class="input col-xs-8">
+												<input type="text" name="state" ng-model="address_setting.state" ng-pattern ="/^(\D)+$/">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.state.$dirty && general_setting_form.state.$invalid"><p>Please enter valid state.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Post Code:</label>
+											<label class="input col-xs-8"><!--for 1 to 6 number /^[0-9]{1,6}$/-->
+												<input type="text" name="post_code" ng-model="address_setting.post_code" ng-pattern="/[0-9]/">
+											</label>
+											<!--div class="error" ng-show="general_setting_form.post_code.$dirty && general_setting_form.post_code.$invalid"><p>Please enter valid post code.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Country:</label>
+											<label class="select col-xs-8">
+												<select ng-model="address_setting.country">
+													<option ng-repeat="country6 in country_data | orderBy : 'name'" value="{{country6.name}}" ng-if="address_setting.country != ''" ng-selected="address_setting.country==country6.name">{{country6.name}}</option>
+													<!--option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.name}}" ng-if="address_setting.country == ''" ng-selected="country_data.name==address_setting.country">{{country_data.name}}</option-->
+													<option style="display:none" value="" selected disabled="disabled">Select Country</option>
+												</select>
+												<i style="right:17px;"></i>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12" style="margin:2% 0">
+											<div class="pull-right">
+												<span style="display:block;" ng-show="general_details_loader">
+													<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99; background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div>
+												</span>
+												<button type="submit" class="btn btn-warning btn-sm pull-right">UPDATE</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingTwo">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Edit Bank Details
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form">
+							<fieldset>
+								<form class="contact-form" name="bank_setting_form" ng-submit="updateBankSettings(bank_setting_form)" novalidate>  
+									<div class="row">
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Bank Details&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="These details will be shown in your invoices to your customers."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<!-- Country list -->
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Country:<span style="color:red;">&nbsp;*</span></label>
+											<label class="select col-xs-8">
+												<select ng-model="bank_setting.calling_code" name="country" ng-change="getBankDetails(bank_setting.calling_code)" required>
+													<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="bank_setting.calling_code" ng-selected="country_data.calling_code==bank_setting.calling_code">{{country_data.name}}</option>
+													<!--option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="!bank_setting.calling_code" ng-selected="country_data.calling_code==address_setting.country">{{country_data.name}}</option-->
+													<option style="display:none" value="">Select Country</option>
+												</select>
+												<i style="right:17px;"></i>
+											</label>
+											<!--div class="error" ng-show="bank_setting_form.country.$dirty && bank_setting_form.country.$invalid"><p>Please select country.</p></div-->
+										</div>
+										<div class="clearfix"></div>
+										<!-- Bank fields and value -->
+										<div class="col-xs-12 col-sm-12 col-lg-12" ng-repeat="param in bank_parameters">
+											<label  class="pull-left col-xs-4" ng-init="arr_index=$index">{{param.name}}:<span style="color:red;">&nbsp;*</span></label>
+											<label class="input col-xs-8">
+												<input type="text" name="bank_parameters_value_{{$index}}" ng-model="bank_setting.bank_parameters_value[$index]" required>
+												<div class="error" ng-show="bank_setting_form['bank_parameters_value_{{$index}}'].$dirty && bank_setting_form['bank_parameters_value_{{$index}}'].$invalid" style="margin-top:5px;"><p>Please enter {{param.name | lowercase}}.</p></div>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Cheque Payable To:<span style="color:red;">&nbsp;*</span>&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Cheques Payble to will be added in invoices as payment instruction to your customers."></i>
+											</label>
+											<label class="input col-xs-8">
+												<input type="text" name="cheque_payment_details" ng-model="bank_setting.cheque_payment_details" required>
+												<div class="error" ng-show="bank_setting_form.cheque_payment_details.$dirty && bank_setting_form.cheque_payment_details.$invalid" style="margin-top:5px;"><p>Please enter cheque payable details.</p></div>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-12" style="margin:2% 0">
+											<div class="pull-right">
+												<span style="display:block;" ng-show="bank_details_loader">
+													<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99; background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div>
+												</span>
+												<button type="submit" class="btn btn-warning btn-sm pull-right">UPDATE</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingThree">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Invoice Messages
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<fieldset ng-if="invoice_messages_is_empty != ''">
+							<div class="error">
+								<p>{{invoice_messages_is_empty}}</p>
+							</div>
+						</fieldset>
+						<fieldset>
+							<form class="contact-form" name="invoice_messege_setting_form" ng-submit="updateInvoiceMessagesSeting(invoice_messege_setting_form)" novalidate>
+								<div class="row">
+									<div class="clearfix"></div>
+									<div class="col-xs-12 col-sm-12 col-lg-12">
+										<table class="table table-bordered table-condensed">
+											<thead>
+												<tr>
+													<th colspan="3">
+														Invoice Messages&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Whilst invoicing a customer, you can add these preset messages to invoices. You can add as many messages here. When invoicing you will be presented with these messages as a dropdown list."></i>
+														<button type="button" ng-click="modalForAddMessage()" class="btn btn-default btn-xs pull-right"><i class="fa fa-plus-square"></i>&nbsp;Add New Invoice Message</button>
+													</th>
+												</tr>
+											</thead>
+											<tbody class="table-hover" ng-if="invoice_messages_is_empty == ''">
+												<tr ng-repeat="invoice_message in invoice_messages">
+													<td valign="middle"  ng-if="invoice_messages_is != '1'"> <!--ng-if="invoice_messages_is != '1'"-->
+														<label class="input col-xs-1 pull-right">{{$index+1}}.</label>
+													</td>
+													<td>
+														<label class="input col-xs-1">
+															<input type="checkbox" name="delete_msg_{{$index}}" ng-model="checked_value_[$index]" ng-true-value="'YES'" ng-false-value="'NO'" ng-click="deleteInvoiceMessage(invoice_message._id, checked_value_[$index])"><i style="top:-10px; left:12px;"></i></label>
+														</label>
+													</td>
+													<td>
+														<label class="input col-xs-10">
+															<input type="text" name="invoice_line_{{$index}}" class="form-control" ng-model="invoice_message.line" required>
+															<input type="hidden" name="invoice_line_id_{{$index}}" class="form-control" ng-model="invoice_message._id" required>
+														</label>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-12 col-md-12 pull-right" style="margin:2% 0" ng-if="invoice_messages_is_empty == ''">
+										<div class="pull-right">
+											<span style="display:block;" ng-show="invoice_messages_loader">
+												<div style="position: relative; right: 0px; display:block; margin:0 auto; top: 0px; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;">
+												</div>
+											</span>
+											<div class="clearfix"></div>
+											<button type="submit" class="btn btn-warning btn-sm pull-right" style=" margin:0 0 5px 5px;">UPDATE SELECTED MESSAGE</button>
+										</div>
+										<div class="pull-right">
+											<span style="display:block; margin-right:5px;" ng-show="delete_invoice_messages_loader">
+												<div style="position: relative; right: 0; top: 0px; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;">
+												</div>
+											</span>
+											<div class="clearfix"></div>
+											<button type="button" class="btn btn-danger btn-sm pull-right" ng-click="deleteInvoiceMessages(invoice_messege_setting_form)" ng-confirm-click="Are you sure you want to delete this message?">DELETE SELECTED MEESSAGE/S</button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</fieldset>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingFour">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Legals
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form">
+							<fieldset>
+								<form class="legal-form" name="business_legal_form" ng-submit="updateLegalForm(business_legal_form)" novalidate>
+									<div class="row">
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Legals&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="The following legals will form part of all the business email commuinication. For example email diclaimer will be attached with all the email communications."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">  
+											<label class="pull-left col-xs-4">Email Disclaimer:</label>&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="The Email Disclaimer you would like to go with emails to customers and drivers."></i>
+											<label class="textarea col-xs-8">
+												<textarea name="mail_disclaimer" ng-model="update_legal.email_disclaimer" row="20"  cols="5" required></textarea>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Booking Terms And Conditions:</label>&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Booking Terms and Conditions you would like your customers to see in Emails sent from this Booking Management System."></i>
+											<label class="textarea col-xs-8">
+												<textarea name="terms_and_conditions" ng-model="update_legal.booking_terms_and_conditions" row="20" cols="5" required></textarea>
+											</label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-md-12 pull-right" style="margin:2% 0">
+											<div class="pull-right">
+												<span style="display:block;" ng-show="update_legal_loader">
+													<div style="position: relative; right: 0px; display:block; margin:0 auto; top: 0px; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;">
+													</div>
+												</span>
+												<div class="clearfix"></div>
+												<button type="submit" class="btn btn-warning btn-sm pull-right">UPDATE</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingFive">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Edit Phone Details
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form">
+							<fieldset>
+								<form name="phone_setting_form" ng-submit="updatePhoneSettings(phone_setting_form)" novalidate>
+									<div class="row">
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Booking Phone&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="The following legals will form part of all the business email commuinication. For example email diclaimer will be attached with all the email communications."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Calling Code<span style="color:red;">&nbsp;*</span></label>       
+											<label class="select">
+												<select name="booking_calling_code" ng-model="phone_settings_booking.calling_code">
+													<option ng-repeat="country in country_data | orderBy : 'name'" value="{{country.calling_code}}"  ng-if="phone_settings_booking.calling_code != ''" ng-selected="phone_settings_booking.calling_code==country.calling_code">{{country.name}} (+{{country.calling_code}})</option>
+													<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="phone_settings_booking.calling_code == ''" ng-selected="country_data.calling_code==bank_setting.calling_code">{{country_data.name}} (+{{country_data.calling_code}})</option>
+													<option style="display:none" value="">Calling Code</option>
+												</select>
+												<i ></i>
+											</label>
+											<div class="error" ng-show="phone_setting_form.booking_calling_code.$dirty && phone_setting_form.booking_calling_code.$invalid"><p>Please select calling code.</p></div>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Phone Number<span style="color:red;">&nbsp;*</span></label>
+											<label class="input">
+												<input type="text" name="booking_phone" ng-model="phone_settings_booking.number" placeholder="Number" minlength="5" maxlength="20" required>
+											</label>
+											<div class="error" ng-show="phone_setting_form.booking_phone.$dirty && phone_setting_form.booking_phone.$invalid"><p>Please enter a valid phone number.</p></div>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Billing Phone
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Billing Phone : Phone through which all invoice related call will send to customer."></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Calling Code</label>
+											<label class="select">
+												<select ng-model="phone_settings_billing.calling_code">
+													<option ng-repeat="country1 in country_data | orderBy : 'name'" value="{{country1.calling_code}}" ng-if="phone_settings_billing.calling_code != ''" ng-selected="phone_settings_billing.calling_code==country1.calling_code">{{country1.name}} (+{{country1.calling_code}})</option>
+													<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="phone_settings_billing.calling_code == ''" ng-selected="country_data.calling_code==address_setting.country">{{country_data.name}}</option>
+													<option style="display:none" value="">Calling Code</option>
+												</select>
+												<i></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Phone Number</label>
+											<label class="input">
+												<input type="text" name="billing_phone" ng-model="phone_settings_billing.number" placeholder="Number" minlength="5" maxlength="20" required>
+											</label>
+											<div class="error" ng-show="phone_setting_form.billing_phone.$error.minlength"><p>Phone number must be in range 5 to 20.</p></div>			
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Support Phone
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Support Phone : Phone through which all support related call will received from customer/staff etc."></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Calling Code</label>
+											<label class="select">
+												<select ng-model="phone_settings_support.calling_code">
+													<option ng-repeat="country2 in country_data | orderBy : 'name'" value="{{country2.calling_code}}"  ng-if="phone_settings_support.calling_code != ''" ng-selected="phone_settings_support.calling_code==country2.calling_code">{{country2.name}} (+{{country2.calling_code}})</option>
+													<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="phone_settings_support.calling_code == ''" ng-selected="country_data.calling_code==address_setting.country">{{country_data.name}}</option>
+													<option style="display:none" value="">Calling Code</option>
+												</select>
+												<i></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Phone Number</label>
+											<label class="input">
+												<input type="text" name="support_phone" ng-model="phone_settings_support.number" placeholder="Number" minlength="5" maxlength="20" required>
+											</label>
+											<div class="error" ng-show="phone_setting_form.support_phone.$error.minlength"><p>Phone number must be in range 5 to 20.</p></div>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Contact Us Phone
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="contact Us Phone : Phone through which a reply will send to user whoever will make contact to {{business_name}}."></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Calling Code</label>
+											<label class="select">
+												<select ng-model="phone_settings_contact_us.calling_code">
+													<option ng-repeat="country3 in country_data | orderBy : 'name'" value="{{country3.calling_code}}" ng-if="phone_settings_contact_us.calling_code != ''" ng-selected="phone_settings_contact_us.calling_code==country3.calling_code">{{country3.name}} (+{{country3.calling_code}})</option>
+													<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="phone_settings_contact_us.calling_code == ''" ng-selected="country_data.calling_code==address_setting.country">{{country_data.name}}</option>
+													<option style="display:none" value="">Calling Code</option>
+												</select>
+												<i></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Phone Number</label>
+											<label class="input">
+												<input type="text" name="contact_us_phone" ng-model="phone_settings_contact_us.number" placeholder="Number" minlength="5" maxlength="20" required>
+											</label>
+											<div class="error" ng-show="phone_setting_form.contact_us_phone.$error.minlength"><p>Phone number must be in range 5 to 20.</p></div>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-12" style="margin-top:10px;">   
+											<label class="label">Driver Communication Phone
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Driver Communication Phone : Phone through all communication call to the driver will made from {{business_name}}."></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Calling Code</label>
+											<label class="select">
+												<select ng-model="phone_settings_driver_communication.calling_code">  
+													<option ng-repeat="country4 in country_data | orderBy : 'name'" value="{{country4.calling_code}}" ng-if="phone_settings_driver_communication.calling_code != ''" ng-selected="phone_settings_driver_communication.calling_code==country4.calling_code">{{country4.name}} (+{{country4.calling_code}})</option>
+													<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}+{{country_data._id}}" ng-if="phone_settings_driver_communication.calling_code == ''" ng-selected="country_data.calling_code==address_setting.country">{{country_data.name}}</option>
+													<option style="display:none" value="">Calling Code</option>
+												</select>
+												<i></i>
+											</label>
+										</div>
+										<div class="col-lg-6 col-sm-6 col-xs-12">
+											<label>Phone Number</label>
+											<label class="input">
+												<input type="text" name="communication_phone" ng-model="phone_settings_driver_communication.number" placeholder="Number" minlength="5" maxlength="20" required>
+											</label>
+											<div class="error" ng-show="phone_setting_form.communication_phone.$error.minlength"><p>Phone number must be in range 5 to 20.</p></div>
+										</div>
+										<div class="col-lg-12" style="margin:2% 0">
+											<div class="pull-right">
+												<span style="display:block;" ng-show="phone_setting_loader">
+													<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99; background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div>
+												</span>
+												<button type="submit" class="btn btn-warning btn-sm pull-right">UPDATE PHONE</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingSix">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Edit Email Details
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form">
+							<fieldset>
+								<form name="email_setting_form" ng-submit="updateEmailSettings(email_setting_form)" novalidate>
+									<div class="row">
+										<div class="col-lg-12">
+											<label class="label">Booking Email
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Booking Email : Email ID through which all booking related email will send to customer."></i>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Email<span style="color:red;">&nbsp;*</span></label>
+											<label class="input">
+												<input type="email" name="booking_email" ng-model="email_settings_booking.email" placeholder="Email ID" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.booking_email.$dirty && email_setting_form.booking_email.$invalid"><p>Please enter valid email address.</p></div>
+										</div>
+										<div class="col-lg-4">
+											<label>Host<span style="color:red;">&nbsp;*</span>
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Host name is use for sending mail from the server</br>for example if you are using gmail  The outgoing host name is smtp.gmail.com."></i>
+											</label>
+											<label class="input">
+												<input type="text" name="booking_host" ng-model="email_settings_booking.host" placeholder="Host" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.booking_host.$dirty && email_setting_form.booking_host.$invalid"><p>Please enter valid host name.</p></div>
+										</div>
+										<div class="col-lg-4">
+											<label>Password<span style="color:red;">&nbsp;*</span></label>
+											<label class="input">
+												<input type="text" name="booking_password" minlength="6" ng-model="email_settings_booking.password" placeholder="Password" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.booking_password.$dirty && email_setting_form.booking_password.$invalid"><p>Please enter password of minimum 6 character.</p></div>
+										</div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Billing Email
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Billing Email : Email ID through which all invoice related email will send to customer."></i>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Email</label>
+											<label class="input">
+												<input type="email" name="billing_email" ng-model="email_settings_billing.email" placeholder="Email ID" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Host
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Host name is use for sending mail from the server</br>for example if you are using gmail  The outgoing host name is smtp.gmail.com."></i>
+											</label>
+											<label class="input">
+												<input type="text" name="billing_host" ng-model="email_settings_billing.host" placeholder="Host" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Password</label>
+											<label class="input">
+												<input type="text" name="billing_password" ng-model="email_settings_billing.password" placeholder="Password" minlength="6" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.billing_password.$error.minlength"><p>Please enter password of minimum 6 character.</p></div>
+										</div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Support Email
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Support Email : Email ID through which all support related email will send to customer/staff etc."></i>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Email</label>
+											<label class="input">
+												<input type="email" name="support_email" ng-model="email_settings_support.email" placeholder="Email ID" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Host
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Host name is use for sending mail from the server</br>for example if you are using gmail  The outgoing host name is smtp.gmail.com."></i>
+											</label>
+											<label class="input">
+												<input type="text" name="support_host" ng-model="email_settings_support.host" placeholder="Host" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Password</label>
+											<label class="input">
+												<input type="text" name="support_password" ng-model="email_settings_support.password" placeholder="Password" minlength="6" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.support_password.$error.minlength"><p>Please enter password of minimum 6 character.</p></div>				
+										</div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Contact Us Email
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Contact Us Email : Email ID through which a reply will send to user whoever will make contact to {{business_name}}."></i>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Email</label>
+											<label class="input">
+												<input type="email" name="contact_us_email" ng-model="email_settings_contact_us.email" placeholder="Email ID" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Host
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Host name is use for sending mail from the server</br>for example if you are using gmail  The outgoing host name is smtp.gmail.com."></i>
+											</label>
+											<label class="input">
+												<input type="text" name="contact_us_host" ng-model="email_settings_contact_us.host" placeholder="Host" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Password</label>
+											<label class="input">
+												<input type="text" name="contact_us_password" ng-model="email_settings_contact_us.password" placeholder="Password" minlength="6" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.contact_us_password.$error.minlength"><p>Please enter password of minimum 6 character.</p></div>	
+										</div>
+										<div class="col-lg-12" style="margin-top:10px;">
+											<label class="label">Driver Communication Email
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#000 !important;" tooltips tooltip-template="Driver Communication Email : Email ID through all communication email to the driver will made from {{business_name}}."></i>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Email</label>
+											<label class="input">
+												<input type="email" name="driver_communication_email" ng-model="email_settings_driver_communication.email" placeholder="Email ID" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Host
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Host name is use for sending mail from the server</br>for example if you are using gmail  The outgoing host name is smtp.gmail.com."></i>
+											</label>
+											<label class="input">
+												<input type="text" name="driver_communication_host" ng-model="email_settings_driver_communication.host" placeholder="Host" required>
+											</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Password</label>
+											<label class="input">
+												<input type="text" name="driver_communication_password" ng-model="email_settings_driver_communication.password" placeholder="Password" minlength="6" required>
+											</label>
+											<div class="error" ng-show="email_setting_form.driver_communication_password.$error.minlength"><p>Please enter password of minimum 6 character.</p></div>	
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-lg-12" style="margin:2% 0">
+											<div class="pull-right">
+												<span class="display:block;" ng-show="email_setting_loader">
+													<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div>
+												</span>
+												<button type="submit" class="btn btn-warning btn-sm pull-right">UPDATE EMAIL</button>   
+											</div>
+										</div>
+									</div>
+								</form>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingSeven">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Edit Google Calendar
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form" >
+							<fieldset>
+								<form name="google_calendar_setting_form" ng-submit="updateGoogleCalender(google_calendar_setting_form)" novalidate>
+									<div class="row">
+										<div class="col-xs-12 col-sm-12 col-lg-12" >
+											<label class="label">Google Calendar Settings&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Google calender setting will help you to put your jobs in your provided google calender for better remainder of jobs."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">
+												Client Id
+													<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" 
+														tooltips tooltip-template="To obtain client id with Google or Google Apps, you will need to register OAuth 2.0 client ID on the Google Developers Console.
+														Where you can obtain client id by creating new credential by selecting application type as web development">
+													</i>
+											</label>
+											<label class="input col-xs-8">
+												<input type="text" name="calender_client_id" ng-model="business_setting.google_calendar.client_id" placeholder="Please enter your Client ID." required>
+												<div class="error" ng-show="google_calendar_setting_form.calender_client_id.$dirty && google_calendar_setting_form.calender_client_id.$invalid" style="margin-top:5px;"><p>Please enter Client ID.</p></div>
+											</label>
+										</div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">
+												Client Secret
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" 
+													tooltips tooltip-template="To obtain Client Secret with Google or Google Apps, you will need to register OAuth 2.0 client ID on the Google Developers Console.
+													Where you can obtain Client Secret by creating new credential by selecting application type as web development">
+												</i>
+											</label>
+											<label class="input col-xs-8">
+												<input type="text" name="calender_client_secret" ng-model="business_setting.google_calendar.client_secret" placeholder="Please enter your Client secret." required>
+												<div class="error" ng-show="google_calendar_setting_form.calender_client_secret.$dirty && google_calendar_setting_form.calender_client_secret.$invalid" style="margin-top:5px;"><p>Please enter your Client secret.</p></div>
+											</label>
+										</div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">
+												Authorized redirect URI
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" 
+													tooltips tooltip-template="To obtain Authorized redirect URI with Google or Google Apps, you will need to register OAuth 2.0 client ID on the Google Developers Console.
+													Where you can obtain Authorized redirect URI by creating new credential by selecting application type as web development">
+												</i>
+											</label>
+											<label class="input col-xs-8">
+												<input type="url" name="redirect_url" ng-model="business_setting.google_calendar.redirect_url" placeholder="Please enter your authorized redirect URI." required>
+												<div class="error" ng-show="google_calendar_setting_form.redirect_url.$dirty && google_calendar_setting_form.redirect_url.$invalid && google_calendar_setting_form.redirect_url.$error.required" style="margin-top:5px;"><p>Please enter your authorized redirect url.</p></div>
+												<div class="error" ng-show="google_calendar_setting_form.redirect_url.$error.url" style="margin-top:5px;"><p>Not a valid url.</p></div>
+											</label>
+										</div>
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">
+												Calender Iframe
+												<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" 
+													tooltips tooltip-template="Calender Iframe is use to show your calender view. 
+													you can obtain it from google calendar setting of your google account whose client secred and ID you had provided">
+												</i>
+											</label>
+											<label class="input col-xs-8"><!--ng-bind-html-->
+												<input type="text" name="calendar_iframe" ng-model="correct_word_iframe" id="calendar_iframe" placeholder="Please enter your google calender iframe." required>
+												<div class="error" ng-show="google_calendar_setting_form.calendar_iframe.$dirty && google_calendar_setting_form.calendar_iframe.$invalid" style="margin-top:5px;"><p>Please enter your google calendar iframe.</p></div>
+											</label>
+										</div>
+										<div class="col-lg-12" style="margin:2% 0 0">
+											<div class="pull-right">
+												<span style="display:block;" ng-show="google_calendar_setting_loader">
+													<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div>					
+												</span>
+												<button type="submit" class="btn btn-warning btn-sm pull-right">UPDATE</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingEight">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseEight" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Edit Invoice Details
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEight">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<div class="panel margin-bottom-10 bms-form" >
+							<form class="contact-form" name="invoice_due_date_and_cc_surcharge_setting_form" ng-submit="updateInvoiceDueDateAndCcSurchargeSetting(invoice_due_date_and_cc_surcharge_setting_form)" novalidate>
+								<div class="error" ng-if="invoice_due_date_setting_is_empty != ''"><p>{{invoice_due_date_setting_is_empty}}</p></div>
+								<fieldset>
+									<div class="row">
+										<div class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="label">Invoice Payable in Days&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="It is the time (in days) the customer needs to pay the invoice. For Example, if you generate an invoice on 01-01-2016 and invoice days is 15, PAY BY DATE for this invoice will automatically become 15-01-2016."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div  class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Select Days:<span style="color:red;">&nbsp;*</span></label>
+											<label class="select col-xs-8">
+												<select name="customer_name" ng-model="invoice_payable_due_date" id="invoice_payable_due_date">
+													<option value="{{due_date.value}}" ng-repeat="due_date in invoice_due_date_date_list | orderBy : 'value'"  ng-selected="due_date.value==invoice_payable_due_date">{{due_date.name}}</option>
+												</select>
+												<!--<select ng-model="invoice_payable_due_date" id="invoice_payable_due_date" ng-options="n for n in [] | range:1:91"></select>  -->
+											</label>
+											<div class="clearfix"></div>
+										</div>
+										<div class="col-xs-12 col-sm-12 col-lg-12" style="margin-top:2%;">
+											<label class="label">Credit Card Surcharge Percentage&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Percentage of amount charged when payment is made through credit card."></i></label>
+										</div>
+										<div class="clearfix"></div>
+										<div  class="col-xs-12 col-sm-12 col-lg-12">
+											<label class="pull-left col-xs-4">Select Percentage:<span style="color:red;">&nbsp;*</span></label>
+											<label class="select col-xs-8">
+												<select name="cc_surcharge_percentage" ng-model="cc_surcharge_percentage" id="cc_surcharge_percentage">
+													<option value="{{percent.value}}" ng-repeat="percent in percent_array" ng-selected="percent.value==cc_surcharge_percentage">{{percent.value | currency:''}}&nbsp;%</option>
+												</select>
+												<!--<select ng-model="invoice_payable_due_date" id="invoice_payable_due_date" ng-options="n for n in [] | range:1:91"></select>  -->
+											</label>
+											<div class="clearfix"></div>
+											<div class="col-xs-12 col-md-12 pull-right" style="padding:2% 0">
+												<div class="pull-right">
+													<span style="display:block;" ng-show="invoice_due_date_and_cc_surcharge_loader">
+														<div style="position: relative; right: 0px; display:block; margin:0 auto; top: 0px; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;">
+														</div>
+													</span>
+													<button type="submit" class="btn btn-warning btn-sm pull-right"  ng-confirm-click="Are you sure you want to update credit card surcharge percentage?">UPDATE</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</fieldset>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- exp -->
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingNine">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseNine" aria-expanded="true" aria-controls="collapseOne">
+								<i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Driver Income/Expenses
+							</a>
+						</h4>
+					</div>
+				</div>
+				<div id="collapseNine" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNine">
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<fieldset>
+							<div class="row">
+								<div class="clearfix"></div>
+								<div class="col-xs-12 col-sm-12 col-lg-12">
+									<table class="table table-bordered table-condensed">
+										<thead>
+											<tr>
+												<th colspan="6">
+													Driver Income&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Driver Income."></i>
+												</th>
+											</tr>
+											<tr>
+												<th>Default Operator %</th><th>Default Driver %</th><th>Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>{{driver_income_type_data.operator_percentage}}%</td>
+												<td>{{driver_income_type_data.driver_percentage}}%</td>
+												<td><button type="button" class="btn btn-xs btn-warning" ng-click="modalForEditDriverIncome(driver_income_type_data)"><i class="fa fa-pencil-square-o"></i>&nbsp;Edit</button></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="panel-body" style="background:#fff; border-top:0px">
+						<fieldset ng-if="driver_expense_messages_is_empty != ''">
+							<div class="error">
+								<p>{{driver_expense_messages_is_empty}}</p>
+							</div>
+						</fieldset>
+						<fieldset>
+							<div class="row">
+								<div class="clearfix"></div>
+								<div class="col-xs-12 col-sm-12 col-lg-12">
+									<table class="table table-bordered table-condensed">
+										<thead>
+											<tr>
+												<th colspan="6">
+													Driver Expenses&nbsp;&nbsp;<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Driver Expense."></i>
+													<button type="button" ng-click="modalForAddDriverExpense()" class="btn btn-default btn-xs pull-right"><i class="fa fa-plus-square"></i>&nbsp;Add New Driver Expense</button>
+												</th>
+											</tr>
+											<tr>
+												<th>Expense Type</th><th>Order Id</th><th>Add Notes Field</th><th>Default Operator %</th><th>Default Driver %</th><th>Action</th>
+											</tr>
+										</thead>
+										<tbody class="table-hover">
+											<tr ng-repeat="driver_expense in driver_expense_type_data | orderBy : 'order_id'">
+												<td>{{driver_expense.expense}}</td>
+												<td>{{driver_expense.order_id}}</td>
+												<td><span ng-if="driver_expense.add_notes_field == true">YES</span><span ng-if="driver_expense.add_notes_field != true">NO</span></td>
+												<td>{{driver_expense.operator_percentage}}%</td>
+												<td>{{driver_expense.driver_percentage}}%</td>
+												<td>
+													<button type="button" class="btn btn-xs btn-warning" ng-click="modalForEditDriverExpense(driver_expense)"><i class="fa fa-pencil-square-o"></i>&nbsp;Edit</button>&nbsp;
+													<button class="btn btn-danger btn-xs" ng-click="deleteDriverExpense(driver_expense._id);" ng-confirm-click="Are you sure you want to delete?"><i class="fa fa-trash-o"></i> Delete</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="clearfix"></div>
+							</div>
+						</fieldset>
+					</div>
+				</div>
+			</div>
+			<!-- exp -->
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<!-- below model will open the success messages. -->
+	<modal visible="success_error_message">
+		<section id="contact-page">
+			<div class="">
+				<div class="alert alert-success" role="alert" ng-if="alert_message_success">
+					<strong>Success!</strong>&nbsp;{{alert_message_success}}
+				</div>
+				<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+					<strong>Error!</strong>&nbsp;{{alert_message_error}}
+				</div>
+			</div>
+		</section>
+	</modal>
+	<!-- below model will open the success messages. -->
+	<modal visible="add_google_account">
+		<section id="contact-page">
+			<div class="">
+				<div class="panel margin-bottom-10 bms-form" style="margin-top:1%" ng-show="get_calender_code">
+					<fieldset>
+						<a href="{{api_auth}}" 
+							target="blank" ng-click="update_code_model();">
+							<button type="submit" class="btn btn-warning btn-sm pull-right">Get Calender Code</button>
+						</a>
+					</fieldset>
+				</div>
+				<div class="panel margin-bottom-10 bms-form" style="margin-top:1%"  ng-hide="get_calender_code">
+					<header>Enter The Code
+						<i class="fa fa-question-circle" style="font-size:13px !important; color:#0096db !important;" tooltips tooltip-template="Please copy and past code form the url got open."></i>
+					</header>
+					<fieldset>
+						<form name="update_google_calender_code" ng-submit="updateGoogleCalenderCode()" novalidate>
+							<div class="row">
+								<div class="col-lg-12">
+									<label class="input">
+										<input type="text" name="update_google_calender_code" id="update_google_calender_code" placeholder="Please enter Google calendar code">
+									</label>
+								</div>
+								<div class="col-lg-12" style="margin:2% 0 0">
+									<div class="pull-right">
+										<span style="display:block;" ng-show="add_google_account_loader">
+											<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;"></div>					
+										</span>
+										<button type="submit" class="btn btn-warning btn-sm pull-right">SUBMIT</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</fieldset>
+				</div>
+			</div>
+		</section>
+	</modal>
+	<!-- below model will open to add a new invoice message -->
+	<modal title="Add New Invoice Message" visible="invoice_message_model">
+		<div class="bms-form noBorder">
+			<div ng-show="add_new_invoice_loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 99;background: url(	http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div>
+			<form name="add_invoice_message_form" ng-submit="addInvoiceMessage(add_invoice_message_form)" novalidate>
+				<div class="">
+					<div class="alert alert-danger" role="alert" ng-if="invoice_message_error">
+						<strong>Error!</strong>&nbsp;{{invoice_message_error}}
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label class="textarea">
+							<textarea class="form-control" rows="3" ng-model="add_invoice_message.line" name="add_message" required=""></textarea>
+						</label>
+						<div class="error" ng-show="add_invoice_message_form.add_message.$dirty && add_invoice_message_form.add_message.$invalid"><p>Please enter message.</p></div>
+					</div>
+					<br>
+					<div class="col-xs-12 col-md-12 pull-right">
+						<button type="submit" class="btn btn-info">Add Message</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- Modal to add driver expenses. -->
+	<modal title="Add New Driver Expense" visible="add_driver_expense_model">
+		<div class="bms-form noBorder">
+			<div ng-show="add_new_driver_expense_loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 99;background: url(	http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div>
+			<form name="add_driver_expense_form" ng-submit="addDriverExpense(add_driver_expense_form.$valid)" novalidate>
+				<div class="row">
+					<div class="alert alert-danger" role="alert" ng-if="add_driver_expense_error">
+						<strong>Error!</strong>&nbsp;{{add_driver_expense_error}}
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Expense Type<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_driver_expense.expense" name="expense" required>
+						</label>
+						<div style="error" ng-show="add_driver_expense_form.expense.$touched || expense" ng-messages="add_driver_expense_form.expense.$error"> 
+							<p ng-message="required">Please enter address expense type.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Order Id<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_driver_expense.order_id" name="order_id" required>
+						</label>
+						<div style="error" ng-show="add_driver_expense_form.order_id.$touched || order_id" ng-messages="add_driver_expense_form.order_id.$error"> 
+							<p ng-message="required">Please enter order id.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Add Notes Field :</label>
+						<label class="checkbox">
+							<input type="checkbox" name="radio-inline1" ng-true-value="true" ng-false-value="false" ng-model="add_driver_expense.add_notes_field"><i></i>
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Operator Default % :</label>
+						<label class="select">
+							<select name="operator_percentage" ng-model="add_driver_expense.operator_percentage" ng-change="add_driver_expense.driver_percentage=(100-add_driver_expense.operator_percentage)">
+								<option ng-repeat="percntg in percent_arr" value="{{percntg}}" ng-selected="percntg==50">{{percntg}}</option>
+							</select>
+						</label>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Driver Default % :</label>
+						<label class="input">
+							<input type="text" readonly ng-model="add_driver_expense.driver_percentage" name="driver_percentage">
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-12 pull-right">
+						<button type="submit" class="btn btn-info">Add</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- Modal to edit driver expenses. -->
+	<modal title="Edit Driver Expense" visible="edit_driver_expense_model">
+		<div class="bms-form noBorder">
+			<div ng-show="edit_new_driver_expense_loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 99;background: url(	http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div>
+			<form name="edit_driver_expense_form" ng-submit="editDriverExpense(edit_driver_expense_form.$valid)" novalidate>
+				<div class="row">
+					<div class="alert alert-danger" role="alert" ng-if="edit_driver_expense_error">
+						<strong>Error!</strong>&nbsp;{{edit_driver_expense_error}}
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Expense Type<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_driver_expense.expense" name="expense" required>
+						</label>
+						<div style="error" ng-show="edit_driver_expense_form.expense.$touched || expense" ng-messages="edit_driver_expense_form.expense.$error"> 
+							<p ng-message="required">Please enter address expense type.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Order Id<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_driver_expense.order_id" name="order_id" required>
+						</label>
+						<div style="error" ng-show="edit_driver_expense_form.order_id.$touched || order_id" ng-messages="edit_driver_expense_form.order_id.$error"> 
+							<p ng-message="required">Please enter order id.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Add Notes Field :</label>
+						<label class="checkbox">
+							<input type="checkbox" name="radio-inline1" ng-true-value="true" ng-false-value="false" ng-model="edit_driver_expense.add_notes_field"><i></i>
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Operator Default % :</label>
+						<label class="select">
+							<select name="operator_percentage" ng-model="edit_driver_expense.operator_percentage" ng-change="edit_driver_expense.driver_percentage=(100-edit_driver_expense.operator_percentage)">
+								<option ng-repeat="percntg in percent_arr" value="{{percntg}}">{{percntg}}</option>
+							</select>
+						</label>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Driver Default % :</label>
+						<label class="input">
+							<input type="text" readonly ng-model="edit_driver_expense.driver_percentage" name="driver_percentage">
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-12 pull-right">
+						<button type="submit" class="btn btn-info">Edit</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- Modal to edit driver income. -->
+	<modal title="Edit Driver Income" visible="edit_driver_income_model">
+		<div class="bms-form noBorder">
+			<div ng-show="edit_new_driver_income_loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 99;background: url(	http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div>
+			<form name="edit_driver_income_form" ng-submit="editDriverIncome(edit_driver_income_form.$valid)" novalidate>
+				<div class="row">
+					<div class="alert alert-danger" role="alert" ng-if="edit_driver_income_error">
+						<strong>Error!</strong>&nbsp;{{edit_driver_income_error}}
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Operator Default % :</label>
+						<label class="select">
+							<select name="operator_percentage" ng-model="edit_driver_income.operator_percentage" ng-change="edit_driver_income.driver_percentage=(100-edit_driver_income.operator_percentage)">
+								<option ng-repeat="percntg in percent_arr" value="{{percntg}}">{{percntg}}</option>
+							</select>
+						</label>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Driver Default % :</label>
+						<label class="input">
+							<input type="text" readonly ng-model="edit_driver_income.driver_percentage" name="driver_percentage">
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-12 pull-right">
+						<button type="submit" class="btn btn-info">Edit</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+</div>

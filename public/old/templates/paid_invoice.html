@@ -1,0 +1,435 @@
+<div ng-controller="paid_invoice" ng-cloak>
+	<div class="row">
+		<div class="col-lg-12" style="margin-top:16px; min-height:750px;">
+			<div class="panel panel-green margin-bottom-10">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-tasks"></i> Paid Invoice
+						<span  class="pull-right">Amount : {{business_setting_details.currency.symbol}} &nbsp;{{total_paid_invoice_amount | number:2 }} </span>
+						<i class="fa fa-file-pdf-o fa-2x pull-right" style="cursor: pointer; font-size: 26px; line-height: 11px;" ng-click="openGeneratePaidInvoicePDFData()" style="cursor:pointer;" tooltips tooltip-side="right" tooltip-template="Export paid invoice data to PDF format."></i>&nbsp;&nbsp;
+						<i class="fa fa-file-excel-o fa-2x pull-right" style="cursor: pointer; font-size: 26px; line-height: 11px;" ng-click="generatePaidInvoiceCSVData()" style="cursor:pointer;" tooltips tooltip-side="right" tooltip-template="Export paid invoice data to CSV format."></i>&nbsp;&nbsp;
+					</h3>
+				</div>
+				<!-- Search Box. -->
+				<div class="panel-body text-center">
+					<div class="col-sm-4 col-sm-offset-4">
+						<div id="imaginary_container">
+							<div class="input-group stylish-input-group">
+								<input type="text" class="form-control"  ng-model="search" placeholder="Search" >
+								<span class="input-group-addon">
+									<button type="submit"> <span class="glyphicon glyphicon-search"></span> </button>
+								</span> 
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table  class="table table-striped table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>&nbsp;</th>
+								<th ng-click="sortInvoiceTableBy('invoice_id')" style="width:8%">Invoice Number&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='invoice_id'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='invoice_id'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<th ng-click="sortInvoiceTableBy('created_on')">Sent On&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='created_on'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='created_on'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<!--<th ng-click="sortInvoiceTableBy('due_date')">Due Date&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='due_date'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='due_date'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>-->
+								<th ng-click="sortInvoiceTableBy('paid_on')">Paid On&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='paid_on'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='paid_on'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<th ng-click="sortInvoiceTableBy('customer_id.name')">Customer Name&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='customer_id.name'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='customer_id.name'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<th ng-click="sortInvoiceTableBy('customer_id.type')">Customer Type&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='customer_id.type'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='customer_id.type'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<th ng-click="sortInvoiceTableBy('amount')" style="text-align:right">Invoice Amount&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='amount'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='amount'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<th>Notes</th>
+								<th ng-click="sortInvoiceTableBy('status')">Status&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='status'" ng-class="{'glyphicon-chevron-down':reverse,'glyphicon-chevron-up':!reverse}"></span></th>
+								<th class="width-200">Action</th>
+							</tr>
+						</thead>
+						<tbody ng-hide="show_paid_invoice_details">
+							<tr>
+								<td colspan="10"><div ng-show="loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div></td>
+
+							</tr>
+						</tbody>   
+						<tbody ng-show="show_paid_invoice_details"><!--orderBy:'-invoice_id'-->
+							<tr dir-paginate="paid_invoice in paid_user_details|orderBy:sortKey:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+							<tr><td colspan="10" ng-show="!paid_user_details.length" style="align:center"><b>No Data Available.</b></td></tr>
+								<tr ng-repeat-start="paid_invoice in paid_user_details|orderBy:sort_table:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+									<td>
+										<button  class="btn btn-info btn-xs" ng-click="showPaidJobDetails = ! showPaidJobDetails">
+											<i class="fa fa-caret-square-o-down"></i>
+										</button>
+									</td>
+									<td>{{paid_invoice.invoice_id}}</td>
+									<td>{{paid_invoice.created_on }}</td>
+								<!--	<td>{{paid_invoice.due_date }}</td> -->
+									<td>{{paid_invoice.paid_on}}</td>
+									<td>{{paid_invoice.customer_id.name}}</td>
+									<td>{{paid_invoice.customer_id.type | uppercase}}</td>
+									<td style="text-align:right">{{business_setting_details.currency.symbol}} &nbsp;{{paid_invoice.invoice_amount | number:2 }}</td>
+									<td>{{paid_invoice.invoice_notes}}</td>
+									<td>{{paid_invoice.status}}</td>
+									<td ng-init="customer_array_index =$index" class="width-200">
+										<!-- button to edit -->
+										<button type="button" class="btn btn-warning btn-xs" ng-click="showPreviewForPaidInvoice(paid_invoice);"><i class="fa fa-eye"></i>VIEW</button>
+										<a href="{{paid_invoice.file_path}}" target="_blank"><button type="button" class="btn btn-warning btn-xs" ><i class="fa fa-file-pdf-o"></i>PDF</button></a>
+									</td>
+								</tr>
+							</tr>
+							<tr ng-repeat-end>
+								<td colspan="12" class="mainBlocktable" ng-show="showPaidJobDetails">
+									<div class="panel panel-green margin-bottom-30 greenBlock" style="border-right:0;"><span class="listingArrow"><img src="http://www.limokit.com/bms_clients/repo/images/listing-arrow.png" alt=""/></span>
+										<div class="panel-heading">
+											<h3 class="panel-title"><i class="fa fa-info-circle"></i> Job Details
+											</h3>
+										</div>
+										<div class="table-responsive">
+											<table class="table table-bordered">
+												<thead>
+													<tr>
+														<th>Job ID</th>
+														<th>Date</th>
+														<th>Pax Name</th>
+														<th>From </th>
+														<th>To </th>
+														<th style="text-align:right">Base Fare </th>
+														<th style="text-align:right">Extra</th>
+														<th style="text-align:right">Total </th>
+													</tr>
+												</thead>
+												<tbody>											
+													<tr><td colspan="10" ng-show="!paid_invoice.jobs.length" style="align:center"><b>No Data Available.</b></td></tr>
+													<tr ng-repeat="job in paid_invoice.jobs">
+														
+														<td>{{job.booking_id.jobs[0].job_id}}</td>
+														<td>{{job.booking_id.jobs[0].pickup_date_time.pickup_date |date :"dd-MM-yyyy"}} {{job.job_detail[0].pickup_date_time.pickup_time}}</td>
+														<td> {{job.booking_id.jobs[0].pax_title}}&nbsp;{{job.booking_id.jobs[0].pax_first_name}}&nbsp;{{job.booking_id.jobs[0].pax_last_name}}</td>
+														<td>
+															{{job.booking_id.jobs[0].from_address.label}} {{job.booking_id.jobs[0].from_address.line_1}} {{job.job_detail[0].from_address.line_2}}
+															{{job.booking_id.jobs[0].from_address.suburb_district}}&nbsp;{{job.booking_id.jobs[0].from_address.post_code}}&nbsp;
+															{{job.booking_id.jobs[0].from_address.state}}&nbsp;{{job.booking_id.jobs[0].from_address.country}}
+														</td>
+														<td>
+															{{job.booking_id.jobs[0].to_address.label}} {{job.booking_id.jobs[0].to_address.line_1}} {{job.job_detail[0].to_address.line_2}}
+															{{job.booking_id.jobs[0].to_address.suburb_district}}&nbsp;{{job.booking_id.jobs[0].to_address.post_code}}&nbsp;
+															{{job.booking_id.jobs[0].to_address.state}}&nbsp;{{job.booking_id.jobs[0].to_address.country}}
+														</td>
+														<td style="text-align:right">{{job.booking_id.jobs[0].fare[0].base_price  | number:2 | currency:business_setting_details.currency.symbol}}</td>
+														<td style="text-align:right">{{job.booking_id.jobs[0].fare[0].total_fare-job.booking_id.jobs[0].fare[0].base_price  | number:2 | currency:business_setting_details.currency.symbol}}</td>
+														<td style="text-align:right"> {{job.booking_id.jobs[0].fare[0].total_fare | number:2 | currency:business_setting_details.currency.symbol}}</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table><!-- end of main table-->
+				</div><!-- end of main table div> -->
+			</div><!-- end of main panel-->
+			<div class="pull-left">
+				<div class="dataTables_length" id="dataTables-example_length">
+					<div class="bms-form noBorder">
+						<label>Show</label>
+						<label class="select">
+							<select ng-model="selected_search_type_per_page" 
+											ng-options="search.value as search.name for search in page_per_pagination" 
+											ng-init="selected_search_type_per_page=selected_page_pagination">
+											<option value="">Select no of rows</option>
+							</select>
+							<i></i>
+						</label>
+					</div>
+				</div>
+			</div>
+			<ul class="pagination pull-right">
+				<dir-pagination-controls
+					max-size="5"
+					direction-links="true"
+					boundary-links="true" >
+				</dir-pagination-controls>
+			</ul>
+			<!-- Below modal show the data generated for pdf. -->
+			<modal title="Paid Invoice Data" visible="generate_paid_invoice_pdf_modal">
+				<div class="panel-heading">
+					<h3>
+						<button type="button" onclick="javascript:generatesPaidInvoicePDF()" class="btn btn-default btn-xs pull-right" id="create_pdf"><i class="fa fa-file-pdf-o"></i>Generate PDF</button>
+					</h3>
+				</div>
+				<div class="panel-body text-center">
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered table-hover" id="paidinvlist">
+							<thead>
+								<tr>
+									<td>Invoice No.</td>
+									<td>Sent On</td>
+									<td>Due Date</td>
+									<td>Paid On</td>
+									<td>Customer Name</td>
+									<td>Customer Type</td>
+									<td>Invoice Amount</td>
+									<td>Notes</td>
+									<td>Status</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="paid_invoice in paid_user_details | orderBy:sort_table:reverse | filter:search">
+									<td>
+										{{paid_invoice.invoice_id}}			
+									</td>
+									<td>
+										{{paid_invoice.created_on | date : "dd-MM-yyyy"}}
+									</td>
+									<td>
+										{{paid_invoice.due_date | date : "dd-MM-yyyy"}}
+									</td>
+									<td>
+										{{paid_invoice.paid_on | date : "dd-MM-yyyy"}}
+									</td>
+									<td>
+										{{paid_invoice.customer_id.name}}
+									</td>
+									<td>
+										{{paid_invoice.customer_id.type | uppercase}}
+									</td>
+									<td style="text-align:right">
+										{{business_setting_details.currency.symbol}} &nbsp;{{paid_invoice.invoice_amount | number:2 }}
+									</td>
+									<td>
+										{{paid_invoice.invoice_notes}}
+									</td>
+									<td>
+										{{paid_invoice.status}}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</modal>
+			
+			<modal title="Invoice Details" visible="preview_paid_invoice_and_send_mail" class="customModal">
+				<form role="preview" ng-submit="reSendInvoiceToCustomer();" name="reSendInvoice" novalidate style="width=1020px">
+					<div class="row">
+						<div class="col-md">
+							<div style=' width: 96%; margin: 0 auto;'>
+								<div style='height: 35px; width: 100%;margin: 20px 0;background: #eee;text-align: center; font: bold 15px Helvetica,ans-Serif;text-decoration: uppercase; letter-spacing: 20px;padding: 8px 0px;'>TAX INVOICE</div>
+								<div>
+									<div style='width: 250px; height: 220px; float: left;'>
+										<img src="{{business_setting_details.bms_logo[0].image_path}}" style='height:90px'/>
+										</br>
+									<strong>{{business_setting_details.business_name}}</strong></br>
+										{{business_setting_details.bms_slogan}}</br>
+										{{business_setting_details.address[0].line_1}}&nbsp;{{business_setting_details.address[0].line_2}}&nbsp;{{business_setting_details.address[0].suburb_district}},</br>
+										{{business_setting_details.address[0].city}}&nbsp;{{business_setting_details.address[0].country}},</br>
+										Email: {{business_setting_details.bms_email.billing_email[0].email}}
+									</div>
+									<div style='text-align: right; float: right; position: relative; margin-top: 25px;border: 1px solid #fff; max-width: 540px; max-height: 100px; overflow: hidden; '>
+										<table style='margin-top: 1px; width: 300px; float: right; '>
+											<tr>
+												<td style='text-align: right; width:50%'>Invoice Number</td>
+												<td style='text-align: right; height: 20px;'> {{paid_invoice_details.invoice_id}}</td>
+											</tr>
+											<tr>
+												<td style='text-align: right; '>Invoice Date</td>
+												<td  style='text-align: right; height: 20px;'>{{paid_invoice_details.created_on | date:'dd-MM-yyyy'}}</td>
+											</tr>
+											<tr>
+												<td style='text-align: right;'>Invoice Amount</td>
+												<td  style='text-align: right; height: 20px;'>{{business_setting_details.currency.symbol}}&nbsp;{{paid_invoice_details.invoice_amount | number:2 }}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+								<div style='clear:both'></div>
+								<div>
+								</br>
+									<div><strong>INVOICE TO  </strong></br>
+										{{paid_invoice_details.customer_id.name}}</br>
+									</div>
+								</div>
+								
+								<div class="panel panel-default margin-bottom-40">
+									<div class="table-responsive">
+										<table class="table table-striped invoice-table">
+										<thead>
+											<tr>
+												<th>&nbsp;Job Number</th>
+												<th>Date</th>
+												<th>Pax Name</th>
+												<th>From Address</th>
+												<th>To Address</th>
+												<th style="text-align:right;">Base Fare</th>
+												<th style="text-align:right;">Extra</th>
+												<th style="text-align:right;">Invoice Total</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="invoice in paid_invoice_details.jobs">
+												<td>
+													&nbsp;{{invoice.booking_id.jobs[0].job_id}}
+												</td>
+												<td>
+													{{invoice.booking_id.jobs[0].pickup_date_time.pickup_time}}&nbsp;{{invoice.booking_id.jobs[0].pickup_date_time.pickup_date| date:'dd-MM-yyyy'}}
+												</td>
+												<td>
+													{{invoice.booking_id.jobs[0].pax_title}}&nbsp;{{invoice.booking_id.jobs[0].pax_first_name}}&nbsp;{{invoice.booking_id.pax_last_name}}
+												</td>
+												<td>
+													{{invoice.booking_id.jobs[0].from_address.line_1}} &nbsp;{{invoice.booking_id.jobs[0].from_address.line_2}}
+												</td>
+												<td >
+													{{invoice.booking_id.jobs[0].to_address.line_1}} &nbsp;{{invoice.booking_id.jobs[0].to_address.line_2}}
+												</td>
+												<td style="text-align:right;">
+													{{business_setting_details.currency.symbol}}&nbsp;{{invoice.booking_id.jobs[0].fare[0].base_price | number:2 }}
+												</td>
+												<td  style="text-align:right;">
+													{{business_setting_details.currency.symbol}}&nbsp;{{invoice.booking_id.jobs[0].fare[0].total_fare - invoice.booking_id.jobs[0].fare[0].base_price | number:2 }}
+												</td>
+												<td style="text-align:right;">
+													<span > {{business_setting_details.currency.symbol}}&nbsp;{{invoice.booking_id.jobs[0].fare[0].total_fare | number:2 }}</span>
+												</td>
+											</tr>
+											<tr ng-show="show_total_part">
+												<td colspan="2" ></td>
+												<td colspan="4" style="text-align: right; "><strong>Total</strong></td>
+												<td  colspan="2" style="text-align: right; ">
+													<strong> {{business_setting_details.currency.symbol}}&nbsp;{{job_total_amount | number:2 }}</strong>
+												</td>
+											</tr>
+											<tr ng-show="show_discount_part">
+												<td colspan="2" ></td>
+												<td colspan="4" style="text-align: right; "><strong>Discount</strong></td>
+												<td  colspan="2" style="text-align: right; ">
+													<strong><span style="color:red">( - )</span> {{business_setting_details.currency.symbol}}&nbsp;{{discount_made_on_invoice | number:2}}</strong>
+												</td>
+											</tr>
+											<tr ng-show="show_invoice_surcharge_part">
+												<td colspan="2" ></td>
+												<td colspan="4" style="text-align: right; "><strong>Invoice Surcharge</strong></td>
+												<td  colspan="2" style="text-align: right; ">
+													<strong> {{business_setting_details.currency.symbol}}&nbsp;{{surcharge_amount | number:2}}</strong>
+												</td>
+											</tr>
+											<tr ng-show="show_tax_on_fare_part">
+												<td colspan="2" ></td>
+												<td colspan="4" style="text-align: right; "><strong>{{business_setting_details.taxes[0].name}}</strong></td>
+												<td  colspan="2" style="text-align: right; ">
+													<strong> {{business_setting_details.currency.symbol}}&nbsp;{{tax_amount_on_fare | number:2}}</strong>
+												</td>
+											</tr>
+											<tr>
+												<td colspan="2" ></td>
+												<td colspan="4" style="text-align: right; "><strong>Invoice Total</strong></td>
+												<td  colspan="2" style="text-align: right; ">
+													<strong> {{business_setting_details.currency.symbol}}&nbsp;{{total_invoice_amount_to_be_paid | number:2}}</strong>
+												</td>
+											</tr>
+											<tr ng-show="show_tax_within_the_fare_part">
+												<td  colspan="8" style="text-align: center; border-bottom:0px; ">
+													<strong> {{tax_is_included_within_the_fare}}</strong>
+												</td>
+											</tr>
+											<tr>
+												<td  colspan="8" style="text-align: center;border-bottom:0px; padding-top:10px; font-size:16px;">
+													<strong> {{paid_invoice_details.invoice_line}} </strong>
+												</td>
+											</tr>
+											<tr>
+											<td colspan="8">
+													<div ng-show="loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;">
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+									</div>
+								</div>
+
+								<div class="panel panel-default margin-bottom-40" ng-hide="!paid_invoice_details.payments.length">
+									<div class="panel-heading">
+										<h3 class="panel-title">Payment details</h3>
+									</div>
+									<div class="table-responsive">
+										<table class="table table-striped invoice-table" style="background:#fff !important">
+											<thead>
+												
+												<tr>
+													<th >Paid on</th>
+													<th >Payment Method</th>
+													<th >Record date </th>
+													<th style='text-align:right'>Amount</th>
+												</tr>
+											</thead>
+											<tbody>
+												<!-- showing all the payment details of user -->
+												<tr ng-repeat="payment in paid_invoice_details.payments"  style="background:#fff !important">
+													<td  style="background:#fff !important">{{payment.date | date:'dd-MM-yyyy'}}</td>
+													<td style="background:#fff !important">{{payment.payment_method | uppercase}}</td>
+													<td style="background:#fff !important">{{payment.created_on | date:'dd-MM-yyyy'}}</td>
+													<td style="text-align:right;background:#fff !important">{{payment.amount | number:2  |  currency:business_setting_details.currency.symbol}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								
+								<div style="clear:both;">
+									<table width="100%">
+										<tbody>
+											<tr>
+												<td><hr style='border:none; border-top:1px dotted #000; color:#fff; background-color:#fff; height:5px;'/></hr></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							
+							</div>
+							
+						</div>
+					</div>
+					<div class="table-responsive">
+					<div class="col-md-4">Remittance Advice</div><div class="col-md-4"> Customer Name : {{paid_invoice_details.customer_id.name}} </div><div class="col-md-4">TAX INVOICE : {{paid_invoice_details.invoice_id}}</div>
+									
+					<div class="col-md-4">PAYMENT METHODS</div>
+					<div class="col-md-4"> {{business_setting_details.currency.symbol}}&nbsp;{{paid_invoice_details.invoice_amount | number:2 }}</div>
+						<table class="table table-striped invoice-table" style="margin-top:10px;">
+							<thead>
+								<tr>
+									<th>BANK TRANSFER</th>
+									<th>CREDIT CARD</th>
+									<th>CHEQUES</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<div ng-repeat="bank in business_setting_details.bank_details"><strong>{{bank.name}}&nbsp:</strong>&nbsp;{{bank.value}} </div>
+										<strong>REF&nbsp;: &nbsp;</strong>{{paid_invoice_details.invoice_id}}
+									</td>
+									<td>
+										Please call or email us with details
+									</td>
+									<td>
+										Please make cheques payable to : <br>
+										<strong>{{business_setting_details.cheque_payment_details}}</strong>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer" >
+						  <button type="submit" class="btn btn-warning btn-xs">SEND INVOICE</button>&nbsp;<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>	
+				</form>
+			</modal>
+		</div><!-- end of main container -->
+	</div>
+	<div class="clearfix"></div>
+</div>
+<script>
+function generatesPaidInvoicePDF() 
+{
+    var doc = new jsPDF('p', 'pt');
+    doc.text("Paid Invoice List", 10, 50);
+	var res = doc.autoTableHtmlToJson(document.getElementById("paidinvlist"));
+	doc.autoTable(res.columns, res.data, {startY: 60,margin: {horizontal: 10},styles: {overflow: 'linebreak'},bodyStyles: {valign: 'top'}});
+	doc.save('paid-invoice-data.pdf');
+}
+</script>

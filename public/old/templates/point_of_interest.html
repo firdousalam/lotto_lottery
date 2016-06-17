@@ -1,0 +1,292 @@
+<div class="row" ng-cloak>
+	<div class="col-lg-12" style="margin-top:16px; min-height:750px;" ng-controller="point_of_interest">
+	<div ng-show="point_of_interest_loader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div>
+	<div class="panel panel-green margin-bottom-10">
+		<!-- heading   -->
+		<div class="panel-heading">
+			<h3 class="panel-title"><i class="fa fa-tasks"></i> Point Of Interest
+				<button type="button" ng-click="openAddPoi()" class="btn btn-default btn-xs pull-right"><i class="fa fa-plus-square"></i> Add POI</button>
+			</h3>
+		</div><!--end of heading   -->
+		
+		<!-- div  for searching-->
+		<div class="panel-body text-center">
+			<div class="col-sm-4 col-sm-offset-4">
+				<div id="imaginary_container">
+					<div class="input-group stylish-input-group">
+						<input type="text" class="form-control"  ng-model="search" placeholder="Search" >
+						<span class="input-group-addon">
+							<button type="submit"> <span class="glyphicon glyphicon-search"></span> </button>
+						</span> 
+					</div>
+				</div>
+			</div>
+		</div><!-- end for searching-->
+		
+		<!-- start of main table div all table should be within this div -->
+		<div class="table-responsive">
+			<!-- start of main table  all data should be place here -->
+			<table  class="table table-striped table-bordered table-hover">
+				<!-- start of main table HEADING-->
+				<thead>
+					<th ng-click="sortPOITableBy('label')">Label&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='label'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='label'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('line_1')">Line 1&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='line_1'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='line_1'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('line_2')">Line 2&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='line_2'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='line_2'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('suburb_district')">Suburb/ District&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='suburb_district'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='suburb_district'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('city')">City&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='city'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='city'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('state')">State&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='state'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='state'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('post_code')">Post Code&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='post_code'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='post_code'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th ng-click="sortPOITableBy('country')">Country&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='country'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='country'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+					<th>Action</th>
+				</thead>
+				<tbody><!-- all data which we want to show must be inside tbody -->
+					<!--  dir-paginate directive will add dom which will go for pagination -->
+					<tr dir-paginate="poi in poi_listing_data|orderBy:sortKey:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+						<tr><td colspan="9" ng-show="!poi_listing_data.length" style="align:center"><b>No Data Available.</b></td></tr>
+						<!--  user details are showing from here using ng-repeat-start  and make searching and sorting etc-->
+						<tr ng-repeat="poi in poi_listing_data|orderBy:sort_table:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+							<td>{{::poi.label}}</td>
+							<td>{{::poi.line_1}}</td>
+							<td>{{::poi.line_2}}</td>
+							<td>{{::poi.suburb_district}}</td>
+							<td>{{::poi.city}}</td>
+							<td>{{::poi.state}}</td>
+							<td>{{::poi.post_code}}</td>
+							<td>{{::poi.country}}</td>
+							<td ng-init="customer_array_index =$index" class="width-200">
+								<!-- button to edit -->
+								<button type="button" class="btn btn-warning btn-xs" ng-click="openEditPoi(poi)"><i class="fa fa-pencil"></i> Edit</button>
+								&nbsp;
+								<!-- button to delete -->
+								<button class="btn btn-danger btn-xs" ng-click="deletePointOfInterest(poi._id);" ng-confirm-click="Are you sure you want to delete?"><i class="fa fa-trash-o"></i> Delete</button>
+							</td>
+						</tr>
+					</tr>
+					<!-- the below Dom will show the details of the user i.e to show second layer (array of an array) using ng-repeat-end  -->
+				</tbody><!--end of main tbody -->
+			</table>
+		</div>
+	</div>
+	<div class="pull-left">
+		<div class="dataTables_length" id="dataTables-example_length">
+			<div class="bms-form" style="border:0;">
+				<label>Show</label>
+				<label class="select">
+					<select ng-model="selected_search_type_per_page" 
+									ng-options="search.value as search.name for search in page_per_pagination" 
+									ng-init="selected_search_type_per_page=selected_page_pagination">
+									<option value="">Select no of rows</option>
+					</select>
+					<i></i>
+				</label>
+			</div>
+		</div>
+	</div>
+	<ul class="pagination pull-right">
+		<dir-pagination-controls
+								max-size="5"
+								direction-links="true"
+								boundary-links="true" >
+		</dir-pagination-controls>
+	</ul>
+	<!-- Below model will open the form to add the poi. -->
+	<modal title="Add Point Of Interest" visible="add_poi_modal">
+	<div class="bms-form noBorder">
+		<form role="form" ng-submit="addPoi(addPoiForm.$valid);" name="addPoiForm" novalidate>
+			<div class="row">
+				<div class="col-xs-12 col-md-12">
+					<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Label <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.label" name="label" required>
+					</label>
+					<div class="error" ng-show="addPoiForm.label.$touched || label" ng-messages="addPoiForm.label.$error"> 
+						<p ng-message="required">Please enter address label.</p>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">Address Line 1 <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.line_1" name="line_1" required>
+					</label>
+					<div class="error" ng-show="addPoiForm.line_1.$touched || line_1" ng-messages="addPoiForm.line_1.$error"> 
+						<p ng-message="required">Please enter address line 1.</p>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">Address Line 2:</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.line_2" >
+					</label>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">City <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.city" name="city" required>
+					</label>
+					<div class="error" ng-show="addPoiForm.city.$touched || city" ng-messages="addPoiForm.city.$error"> 
+						<p ng-message="required">Please enter city.</p>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">Suburb/ District <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.suburb_district" name="suburb_district" required>
+					</label>
+					<div class="error" ng-show="addPoiForm.suburb_district.$touched || suburb_district" ng-messages="addPoiForm.suburb_district.$error"> 
+						<p ng-message="required">Please enter suburb/district.</p>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">State <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.state" name="state" required>
+					</label>
+					<div class="error" ng-show="addPoiForm.state.$touched || state" ng-messages="addPoiForm.state.$error"> 
+						<p ng-message="required">Please enter state.</p>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Post Code <span style="color:red;">*</span> :</label>
+					<label class="input">
+						<input type="text" ng-model="add_poi.post_code" name="post_code" required>
+					</label>
+					<div class="error" ng-show="addPoiForm.post_code.$touched || post_code" ng-messages="addPoiForm.post_code.$error"> 
+						<p ng-message="required">Please enter post code.</p>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">Country <span style="color:red;">*</span> :</label>
+					<label class="select">
+						<select ng-model="add_poi.country" ng-init="add_poi.country=country_name" name="country" required>
+							<option value="">Country</option>
+							<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.name}}" ng-selected="add_poi.country==country_data.name">{{country_data.name}}</option>
+						</select>
+						<i></i>
+					</label>
+					<div class="error" ng-show="addPoiForm.country.$touched || country" ng-messages="addPoiForm.country.$error"> 
+						<p ng-message="required">Please enter country.</p>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="modal-footer" >
+					<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+					<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+					<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	</modal>
+	<!-- Below model will open the form to add the poi. -->
+	<modal title="Edit Point Of Interest" visible="edit_poi_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="editPoi(editPoiForm.$valid);" name="editPoiForm" novalidate>
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Label <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.label" name="label" required>
+						</label>
+						<div class="error" ng-show="editPoiForm.label.$touched || label" ng-messages="editPoiForm.label.$error"> 
+							<p ng-message="required">Please enter address label.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Address Line 1 <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.line_1" name="line_1" required>
+						</label>
+						<div class="error" ng-show="editPoiForm.line_1.$touched || line_1" ng-messages="editPoiForm.line_1.$error"> 
+							<p ng-message="required">Please enter address line 1.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Address Line 2:</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.line_2" >
+						</label>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">City <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.city" name="city" required>
+						</label>
+						<div class="error" ng-show="editPoiForm.city.$touched || city" ng-messages="editPoiForm.city.$error"> 
+							<p ng-message="required">Please enter city.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Suburb/ District <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.suburb_district" name="suburb_district" required>
+						</label>
+						<div class="error" ng-show="editPoiForm.suburb_district.$touched || suburb_district" ng-messages="editPoiForm.suburb_district.$error"> 
+							<p ng-message="required">Please enter suburb/district.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">State <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.state" name="state" required>
+						</label>
+						<div class="error" ng-show="editPoiForm.state.$touched || state" ng-messages="editPoiForm.state.$error"> 
+							<p ng-message="required">Please enter state.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Post Code <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_poi.post_code" name="post_code" required>
+						</label>
+						<div class="error" ng-show="editPoiForm.post_code.$touched || post_code" ng-messages="editPoiForm.post_code.$error"> 
+							<p ng-message="required">Please enter post code.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Country <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select class="form-control"  ng-model="edit_poi.country" name="country" required>
+								<option value="">Country</option><option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.name}}" ng-selected="edit_poi.country==country_data.name">{{country_data.name}}</option>
+							</select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editPoiForm.country.$touched || country" ng-messages="editPoiForm.country.$error"> 
+							<p ng-message="required">Please enter country.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="modal-footer" >
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>
+				</div>	
+			</form>
+		</div>
+	</modal>
+	<!-- below model will open the messages. -->
+	<modal visible="success_error_message">
+		<section id="contact-page">
+			<div class="">
+				<div class="alert alert-success" role="alert" ng-if="alert_message_success">
+					<strong>Success!</strong>&nbsp;{{alert_message_success}}
+				</div>
+				<!--<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+					<strong>Error!</strong>&nbsp;{{alert_message_error}}
+				</div>-->
+			</div>
+		</section>
+	</modal>
+</div>
+</div>
+<div class="clearfix"></div>

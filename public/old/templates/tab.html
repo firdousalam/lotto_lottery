@@ -1,0 +1,13 @@
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.js"></script>
+<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.13.0.js"></script>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<div ng-controller="bookingListController" ng-cloak>
+<div ng-include src="'../repo/templates/header.html'" ng-cloak></div>
+	<tabset>
+		<tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disable="tab.disabled">
+      <div ng-include="tabs[selectedTab]"></div>
+    </tab>
+  </tabset>
+<div class="clearfix"></div>
+<div ng-include src="'../repo/templates/footer.html'"></div> 
+</div>

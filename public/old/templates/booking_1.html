@@ -1,0 +1,1552 @@
+<!-- Include the header template. -->
+<div ng-include src="'../repo/templates/header.html'"></div>
+<hr>
+<hr>
+<hr>
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+<!-- Meta -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!--<link rel="stylesheet" href="css/style.css">
+-->
+<link rel="stylesheet" href="http://www.limokit.com/bms_clients/repo/css/app.css">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="http://www.limokit.com/bms_clients/repo/css/main-form.css">
+<link rel="stylesheet" href="http://www.limokit.com/bms_clients/repo/css/custom-form.css">
+<script src="https://rawgithub.com/cletourneau/angular-bootstrap-datepicker/master/dist/angular-bootstrap-datepicker.js" charset="utf-8"></script>
+<!-- Optional theme -->
+<!-- Latest compiled and minified JavaScript -->
+</head>
+<body>
+</br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel new-booking margin-bottom-40 bmsSec">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-book"></i>New Booking</h3>
+        </div>
+        
+		<form  id="bms-form" name="booking_form_validate" class="bms-form" ng-submit="addBooking(booking_form_validate);" novalidate>
+		<div class="panel-body">
+          <div class="col-lg-3 col-md-2 col-sm-4 col-xs-12">
+            <div class="bms-form">
+              <header>Step 1: Customer Details</header>
+              <fieldset>
+                <div class="row">
+				<section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+					<label class="select">
+					  <select name="cust_type" ng-model="booking_form.customer_type" ng-change="getCustomerNameByCustomerType(booking_form.customer_type)" required >
+							<option value="" disabled selected hidden>Customer Type</option>
+							<option value="corporate">Corporate</option>
+							<option value="individual">Individual</option>
+					  </select>
+					  <i></i>
+					   </label>
+					   <span ng-hide="loder_image" class="loader"><a class="iconSmall"><i class="fa fa-spinner fa-pulse"></i></a></span>
+						<div style="color: red;" ng-show="booking_form_validate.cust_type.$dirty && booking_form_validate.cust_type.$invalid">
+							Please select customer type.
+						</div>
+				  </section>
+                  <section class="col col-sm-12 col-xs-12">
+                    <label class="select">
+                      <select name="customer_name" ng-model="booking_form.customer_id" ng-change="getBookingMadeBydetails(booking_form.customer_id)" ng-init="booking_form.customer_id=''" required>
+					  <option value="" selected="selected" disabled>Customer Name</option>
+                        <option value="{{customer._id}}" ng-repeat="customer in customer_listing_data |orderBy:'name'">{{customer.name}}</option>
+                      </select>
+                       </label>
+					   <div style="color: red;" ng-show="booking_form_validate.customer_name.$dirty && booking_form_validate.customer_name.$invalid">
+						Please select customer name.
+						</div>
+                    <a class="iconSmall"><i class="fa fa-plus-circle" ng-hide="openAccountButtonAddAccount" ng-click="showNewAccountDiv('open')"></i></a><a class="iconSmall"><i class="fa fa-minus-circle" ng-hide="closeAccountButtonAddAccount" ng-click="showNewAccountDiv('close')"></i></a> 
+					</section>
+					<div class="clearfix"></div>
+					
+					<div class="clearfix"></div>
+					<div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">
+                          <div class="panel">
+                            <div class="panel-body" ng-hide="add_account_div">
+							 <h4 class="panel-title">New Customer Name</h4>
+							 <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+							<!-------- Unique email id or account name check ------------------->
+								<div style="color: red;" ng-show="booking_form_validate.new_account_unique.$dirty">
+									{{error_message}}
+								</div>
+                                <label class="input">
+                                   <input type="text" name="new_customer_name" placeholder="Customer Name" ng-model="booking_form_new_account.name" required>
+							   </label>
+							   <div style="color: red;" ng-show="booking_form_validate.new_customer_name.$dirty && booking_form_validate.new_customer_name.$invalid">
+								Please enter customer name.
+								</div>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="new_account_payment_type" ng-model="booking_form_new_account.payment_type" ng-init="booking_form_new_account.payment_type=''" ng-change="getInvoiceInformationDiv(booking_form_new_account.payment_type)" required>
+										<option value="">Payment Type</option>
+										<option value="collect">Collect</option>
+										<option value="credit">Charge credit card</option>
+										<option value="invoice">Invoice</option>
+                                  </select>
+                                   </label>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_payment_type.$dirty && booking_form_validate.new_account_payment_type.$invalid">
+									Please select a payment type.
+									</div>
+                              </section>
+							  <!-------- Invoice information ----------------------------------->
+
+							  <!-------- End of invoice information ---------------------------->
+							  <div ng-hide="invoice_information">
+							   <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="text" name="" placeholder="Frequency" ng-model="booking_form_new_account.invoice_frequency">
+                                 </label>
+                              </section>
+							   <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-model="booking_form_new_account.invoice_surcharge_percentage">
+                                 <label class="input">
+                                   <input type="text" name="" placeholder="Surchrg(%):">
+                                 </label>
+                              </section>
+							   <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="text" name="" placeholder="Discount(%):" ng-model="booking_form_new_account.invoice_discount_percentage">
+                                 </label>
+                              </section>
+							  </div>
+							  <!-------- Booking made by information new account contact-------->
+							   <h4 class="panel-title">Booking Made By Information</h4>
+							   <section style="padding-left:1;" class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+								<!--- Validation message for Booking made by customer -->
+										<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_first_name.$dirty && booking_form_validate.new_account_booking_made_first_name.$invalid">
+											Please enter first name.
+										</div>
+										<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_last_name.$dirty && booking_form_validate.new_account_booking_made_last_name.$invalid">
+											Please enter last name.
+										</div>
+										<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_ph_type.$dirty && booking_form_validate.new_account_booking_made_ph_type.$invalid">
+											Please select Phone type.
+										</div>
+										<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_number.$dirty && booking_form_validate.new_account_booking_made_number.$invalid">
+											Please enter Number.
+										</div>
+										<div style="color: red;">
+											{{valid_phone_number}}
+										</div>
+											<div style="color: red;">
+											{{unique_error_message}}
+										</div>
+									
+										<div style="color: red;" ng-show="booking_form_validate.booking_made_contact_type.$dirty && booking_form_validate.booking_made_contact_type.$invalid">
+											Please select a contact type.
+										</div>
+									<!--- Validation message for New Pax registration -->
+										<div style="color: red;" ng-show="booking_form_validate.new_account_pax_first_name.$dirty && booking_form_validate.new_account_pax_first_name.$invalid">
+											Please enter first name.
+										</div>
+										<div style="color: red;" ng-show="booking_form_validate.new_account_pax_last_name.$dirty && booking_form_validate.new_account_pax_last_name.$invalid">
+											Please enter last name.
+										</div>
+										<div style="color: red;" ng-show="booking_form_validate.new_account_pax_ph_type.$dirty && booking_form_validate.new_account_pax_ph_type.$invalid">
+											Please select Phone type.
+										</div>
+										<div style="color: red;" ng-show="booking_form_validate.new_account_pax_number.$dirty && booking_form_validate.new_account_pax_number.$invalid">
+											Please enter pax Number.
+										</div>
+										<div style="color: red;">
+											{{valid_pax_phone_number}}
+										</div>
+											<div style="color: red;">
+											{{pax_unique_error_message}}
+										</div>
+									<!--- Validation message for Unique email check for contacts -->
+                                <label class="select">
+                                  <select name="booking_made_contact_type" ng-model="booking_form_new_account.contact_type" ng-change="getPaxDetailsDiv()" required>
+									<option value="all">All</option>
+									<option value="booking">Booking</option>
+									<option value="" style="display:none">Contact Type</option>
+                                  </select>
+                                   </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12" >
+                                <label class="select">
+                                  <select name="pax_title" ng-model="booking_form_new_account.title" ng-init="booking_form_new_account.title='Mr'">
+									<option value="Mr">Mr</option>
+									<option value="Mrs">Mrs</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="new_account_booking_made_first_name" placeholder="First name" ng-model="booking_form_new_account.first_name" required>
+                                 </label>
+									
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="new_account_booking_made_last_name" placeholder="Last name" ng-model="booking_form_new_account.last_name" required>
+                                 </label>
+									
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="new_account_booking_made_ph_type" ng-model="booking_form_new_account.ph_type" ng-init="booking_form_new_account.ph_type=''" required>
+									<option value="">Ph Type</option>
+									<option value="mobile">Mobile</option>
+									<option value="work">Work</option>
+                                    <option value="home">Home</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="select">
+                                  <select name="calling_code" ng-model="booking_form_new_account.calling_code" ng-init="booking_form_new_account.calling_code='91'">
+									<option value="{{country.calling_code}}" ng-repeat="country in country_data">(+{{country.calling_code}})</option>
+                                  </select>
+                                  </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="new_account_booking_made_number" placeholder="Number" ng-model="booking_form_new_account.number" required>
+                                 </label>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="email" name="new_account_booking_made_email" placeholder="Email" ng-model="booking_form_new_account.email" ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" required>
+                                 </label>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_email.$dirty && booking_form_validate.new_account_booking_made_email.$invalid">
+											Please enter email id.
+									</div>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="password" name="new_account_booking_made_password" placeholder="Password" ng-model="booking_form_new_account.password" minlength="6" required>
+                                 </label>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_password.$dirty && booking_form_validate.new_account_booking_made_password.$invalid">
+											Please enter password.
+									</div>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_booking_made_password.$dirty && booking_form_validate.new_account_booking_made_password.$invalid">
+											{{valid_password}}
+									</div>
+										
+								  <a class="iconSmall"><i class="fa  fa-question-circle"  tooltips tooltip-template="Password will be used to login."></i></a>
+                              </section>
+							   <a class="btn btn-success btn-xs" ng-hide="pax_details_open_button" ng-click="showNewPaxInformationWithNewAccount = ! showNewPaxInformationWithNewAccount;">Add Pax Details</a></label>
+							  
+							   <!-------- New passenger add information when new account add ------>
+							   <div ng-show="showNewPaxInformationWithNewAccount">
+							   <section style="padding-left:1;" class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                <label class="input">
+                                  <input type="hidden" name="" value="Pax Only">
+                                </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+								
+                                <label class="select">
+                                  <select name="new_account_pax_title" ng-model="booking_form_new_account.pax_title" ng-init="booking_form_new_account.pax_title='Mr'">
+                                    <option value="Mr">Mr</option>
+									<option value="Mrs">Mrs</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="text" name="new_account_pax_first_name" placeholder="First name" ng-model="booking_form_new_account.pax_first_name" required>
+                                 </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="text" name="new_account_pax_last_name" placeholder="Last name" ng-model="booking_form_new_account.pax_last_name" required>
+                                 </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="new_account_pax_ph_type" ng-model="booking_form_new_account.ph_type" ng-model="booking_form_new_account.pax_type"  ng-init="booking_form_new_account.pax_type=''">
+									<option value="">Ph Type</option>
+									<option value="mobile">Mobile</option>
+									<option value="work">Work</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="select">
+                                  <select name="calling_code" ng-model="booking_form_new_account.pax_calling_code" ng-init="booking_form_new_account.pax_calling_code='1'">
+									<option value="{{country.calling_code}}" ng-repeat="country in country_data">(+{{country.calling_code}})</option>
+                                  </select>
+                                  </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="text" name="new_account_pax_number" placeholder="Number" ng-model="booking_form_new_account.pax_number" required>
+                                 </label>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="new_account_pax_email" placeholder="Email" ng-model="booking_form_new_account.pax_email" ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" required>
+                                 </label>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_pax_email.$dirty && booking_form_validate.new_account_pax_email.$invalid">
+											Please enter email id.
+									</div>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="password" name="new_account_pax_password" placeholder="Password" ng-model="booking_form_new_account.pax_password">
+                                 </label>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_pax_password.$dirty && booking_form_validate.new_account_pax_password.$invalid">
+											Please enter password.
+									</div>
+									<div style="color: red;" ng-show="booking_form_validate.new_account_pax_password.$dirty && booking_form_validate.new_account_pax_password.$invalid">
+											{{valid_password}}
+									</div>
+								  <a class="iconSmall" href=""><i class="fa  fa-question-circle"  tooltips tooltip-template="Email will be used to login."></i></a>
+                              </section>
+							 </div>
+							  <!-------- End new  passenger information -------->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+					<div class="clearfix"></div>
+				  <section class="col col-sm-12 col-xs-12" ng-hide="booking_made_by_div">
+                    <label class="select">
+                      <select name="book_made" ng-model="booking_form.booking_made_by_id" ng-init="booking_form.booking_made_by_id=''" ng-change="getPaxListData()" required >
+					   <option value="">Booking Made By</option>
+                        <option value="{{customer._id}}" ng-repeat="customer in booking_made_listing_data |orderBy:'name.first_name'" ng-if="customer.contact_type=='booking' || customer.contact_type=='all' ">{{customer.name.first_name}} {{customer.name.last_name}}</option>
+                      </select>
+                      </label>
+					   <div style="color: red;" ng-show="booking_form_validate.book_made.$dirty && booking_form_validate.book_made.$invalid">
+						Please select booking made by.
+						</div>
+					  <a class="iconSmall"><i class="fa fa-plus-circle" ng-hide="openAccountButtonAddBookingMade" ng-click="showNewBookingMadetDiv('open')"></i></a><a class="iconSmall"><i class="fa fa-minus-circle" ng-hide="closeAccountButtonAddBookingMade" ng-click="showNewBookingMadetDiv('close')"></i></a>
+				   </section>
+					<div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">
+						<!--  New Booking made by information Add  -->
+                          <div class="panel">
+                            <div class="panel-body" ng-hide="showBookingMadeInformation">
+							 <h4 class="panel-title">Booking Made By Information</h4>
+							   <section style="padding-left:1;" class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="contact_type" ng-model="booking_form_new_booking_made.contact_type" ng-init="booking_form_new_booking_made.contact_type=''" ng-change="getPaxDetails(booking_form_new_booking_made.contact_type)">
+								   <option value=" ">Contact Type</option>
+									<option value="all">All</option>
+									<option value="booking">Booking</option>
+                                  </select>
+                                   </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-model="booking_form.booking_made_title" ng-init="booking_form.booking_made='Mr'">
+                                <label class="select">
+                                  <select name="pax_title">
+                                    <option value="Mr">Mr</option>
+									<option value="Mrs">Mrs</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="First name" ng-model="booking_form.booking_made_first_name">
+                                 </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Last name" ng-model="booking_form.booking_made_last_name">
+                                 </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-model="booking_form.booking_made_ph_type" ng-init="booking_form.booking_made.ph_type='ph_type'">
+                                <label class="select">
+                                  <select name="ph_type">
+									<option value="ph_type">Ph Type</option>
+									<option value="mobile">Mobile</option>
+									<option value="work">Work</option>
+                                    <option value="home">Home</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="select">
+                                  <select name="calling_code" ng-model="booking_form.booking_made_calling_code" ng-init="booking_form.booking_made_calling_code='+91'">
+									<option value="{{country.calling_code}}" ng-repeat="country in country_data">(+{{country.calling_code}})</option>
+                                  </select>
+                                  </select>
+                                  </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Number" ng-model="booking_form.booking_made_number">
+                                 </label>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Email" ng-model="booking_form.booking_made_email">
+                                 </label>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="password" name="" placeholder="Password" ng-model="booking_form.booking_made_password">
+                                 </label>
+								  <a class="iconSmall"><i class="fa  fa-question-circle"></i></a>
+                              </section>
+                            </div>
+                          </div>
+						  <!--  End Booking made by information -->
+                        </div>
+                      </div>
+                  <section class="col col-sm-12 col-xs-12" ng-hide="select_passenger_div">
+                    <label class="select">
+                      <select name="paxname" ng-model="booking_form.pax_id" ng-change="getPaxInformationBySelectValue(booking_form.pax_id)" ng-init="booking_form.pax_id=''" required>
+                        <option value="">Pax Name</option>
+                        <option value="{{pax._id}}" ng-repeat="pax in booking_made_listing_data|orderBy:'name.first_name'" ng-if="pax.contact_type=='pax' || customer.contact_type=='all'">{{pax.name.first_name}} {{pax.name.last_name}}</option>
+                      </select>
+                      <i></i> </label>
+					  <div style="color: red;" ng-show="booking_form_validate.paxname.$dirty && booking_form_validate.paxname.$invalid">
+						Please select pax name.
+						</div>
+                    <a class="iconSmall"><i class="fa fa-plus-circle" ng-hide="openAccountButtonAddPax" ng-click="showNewPaxDiv('open')"></i></a><a class="iconSmall"><i class="fa fa-minus-circle" ng-hide="closeAccountButtonAddPax" ng-click="showNewPaxDiv('close')"></i></a> 
+					</section>
+					<div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">
+                          <div class="panel">
+                            <div class="panel-body" ng-hide="showPaxInformation" >
+							 <h4 class="panel-title">New Pax name</h4>
+							 <section style="padding-left:1;" class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                <label class="input">
+                                  <input type="hidden" name="" value="Pax Only">
+                                   </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-model="booking_form_new_pax.pax_title" ng-init="booking_form_new_pax.pax_title='Mr'">
+                                <label class="select">
+                                  <select name="pax_title">
+                                    <option value="Mr">Mr</option>
+									<option value="Mrs">Mrs</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="First name" ng-model="booking_form_new_pax.pax_first_name">
+                                 </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Last name" ng-model="booking_form_new_pax.new_account.pax_last_name">
+                                 </label>
+                              </section>
+							  <section style="padding-left:1;" class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="ph_type" ng-model="booking_form_new_pax.pax_ph_type">
+									<option value="ph_type">Ph Type</option>
+									<option value="mobile">Mobile</option>
+									<option value="work">Work</option>
+                                    <option value="home">Home</option>
+                                  </select>
+                                  </label>
+                              </section>
+							  <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="select">
+                                  <select name="calling_code" ng-model="booking_form_new_pax.pax_calling_code" ng-init="booking_form_new_pax.pax_calling_code='+91'">
+									<option value="{{country.calling_code}}" ng-repeat="country in country_data">(+{{country.calling_code}})</option>
+                                  </select>
+                                  </label>
+                              </section>
+                               <section class="col col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Number" ng-model="booking_form_new_pax.pax_number">
+                                 </label>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Email" ng-model="booking_form_new_pax.pax_email">
+                                 </label>
+                              </section>
+							    <section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                 <label class="input">
+                                   <input type="tel" name="" placeholder="Password" ng-model="booking_form_new_pax.pax_password">
+                                 </label>
+								  <a class="iconSmall"><i class="fa  fa-question-circle"></i></a>
+                              </section>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+					  <!-------- Dropdown pax information populate -------> 
+					 <div ng-hide="pax_details_by_dropdown_select_value">
+                  <section class="col col-sm-12 col-xs-12">
+                    <label class="input"> <i class="icon-append fa fa-phone"></i>
+                      <input type="tel" name="phone" readonly placeholder="Phone No" value="{{pax_details_data.phone[0].number}}">
+                    </label>
+                  </section>
+                  <section class="col col-sm-12 col-xs-12">
+                    <label class="input"> <i class="icon-append fa fa-phone"></i>
+                      <input type="tel" name="phone" placeholder="Alternate Phone No">
+                    </label>
+                  </section>
+                  <section class="col col-sm-12 col-xs-12">
+                    <label class="input"> <i class="icon-append fa fa-envelope"></i>
+                      <input type="email" readonly placeholder="E-mail" name="email" value="{{pax_details_data.email}}">
+                    </label>
+                  </section>
+                  <section class="col col-sm-12 col-xs-12">
+                    <label class="textarea"> <i class="icon-append fa fa-comment"></i>
+                      <textarea placeholder="Pax Preferences" name="comment" rows="2"></textarea>
+                    </label>
+                  </section>
+				  </div>
+				   <!-------- End Dropdown pax information populate -------> 
+                  <section class="col col-sm-12 col-xs-12">
+                    <label class="label">Booking Source</label>
+                    <div class="inline-group">
+                      <label class="radio">
+                        <input type="radio" name="radio-inline" value="phone" checked="" ng-model="booking_form.booking_source">
+                        <i></i>Phone</label>
+                      <label class="radio">
+                        <input type="radio" name="radio-inline" value="email" ng-model="booking_form.booking_source">
+                        <i></i>Email</label>
+                      <label class="radio">
+                        <input type="radio" name="radio-inline" value="website" ng-model="booking_form.booking_source">
+                        <i></i>Website</label>
+                      <label class="radio">
+                        <input type="radio" name="radio-inline" value="app" ng-model="booking_form.booking_source">
+                        <i></i>App</label>
+                      <label class="radio">
+                        <input type="radio" name="radio-inline" value="bms" ng-model="booking_form.booking_source">
+                        <i></i>BMS</label>
+					  <a class="iconSmall" href=""><i class="fa fa-question-circle" tooltips tooltip-template="Source from where you have received this booking. For example, if you received it from your website, select Website"></i></a>
+
+                    </div>
+                  </section>
+				  <section class="col col-sm-12 col-xs-12">
+                    <label class="label">Send Confirmation To</label>
+                    <div class="inline-group">
+                      <label class="checkbox">
+                        <input type="checkbox" name="radio-inline1" value="booking_made_by" ng-model="booking_form.booking_made_by_id_confirmation">
+                        <i></i>To Booking Made By</label>
+                      <label class="checkbox">
+                        <input type="checkbox" name="radio-inline2" value="to_pax" ng-model="booking_form.pax_confirmation">
+                        <i></i>To Pax</label>
+					  <a class="iconSmall" href=""><i class="fa fa-question-circle" tooltips tooltip-template="Selected type of contacts under a customer will be sent a booking confirmation with booking values"></i></a>
+
+                    </div>
+                  </section>
+                  <section class="col col-lg-12">
+				  <label class="label">Notes</label>
+                    <label class="textarea"> <i class="icon-append fa fa-comment"></i>
+                      <textarea placeholder="Internal notes" name="comment" rows="2" ng-model="booking_form.internal_notes"></textarea>
+                    </label>
+                    <a class="iconSmall" href=""><i class="fa  fa-question-circle" tooltips tooltip-template="These notes will not be used for any communication either with customer or driver. These are only for viewing by Admin and Staff."></i></a></section>
+                  <section class="col col-lg-12">
+                    <label class="textarea"> <i class="icon-append fa fa-comment"></i>
+                      <textarea placeholder="External notes" name="comment" rows="2" ng-model="booking_form.external_notes"></textarea>
+                    </label>
+                    <a class="iconSmall" href=""><i class="fa fa-question-circle" tooltips tooltip-template="These notes will be used for communication with drivers and customers and are public in nature."></i></a></section>
+                </div>
+              </fieldset>
+            </div>
+            <!--step 1 end--> 
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-4 col-xs-12" style="padding-left:0px; padding-right:0px;"> 
+            <div class="bms-form">
+              <header>Step 2: Journey Details</header>
+              <fieldset>
+                  <div class="col-md-12" style="padding:0;">
+                    <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12" style="padding-left:0;">
+                      <label class="select">
+                        <select name="Booking Type" ng-model="booking_form.booking_type" ng-init="booking_form.booking_type='one_way'" ng-change="getDropUpDetails()">
+                          <option value="0" selected disabled>Booking Type</option>
+                          <option value="one_way">One way</option>
+                          <option value="return">Return</option>
+                          <option value="hourly">Hourly</option>
+                        </select>
+                        <i></i> </label>
+                    </section>
+                    <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12" style="padding-right:0;">
+                      <label class="select" ng-hide="pick_up_hour">
+                      <select name="number_hour" ng-model="booking_form.no_of_hours" ng-init="booking_form.no_of_hours='0'">
+                        <option value="0">0 hour</option>
+						<option value="1">1 hour</option>
+						<option value="2">2 hour</option>
+						<option value="3">3 hour</option>
+						<option value="4">4 hour</option>
+						<option value="5">5 hour</option>
+						<option value="6">6 hour</option>
+						<option value="7">7 hour</option>
+						<option value="8">8 hour</option>
+						<option value="9">9 hour</option>
+						<option value="10">10 hour</option>
+						<option value="11">11 hour</option>
+						<option value="12">12 hour</option>
+						<option value="13">13 hour</option>
+						<option value="14">14 hour</option>
+						<option value="15">15 hour</option>
+						<option value="16">16 hour</option>
+						<option value="17">17 hour</option>
+						<option value="18">18 hour</option>
+						<option value="19">19 hour</option>
+						<option value="20">20 hour</option>
+						<option value="21">21 hour</option>
+						<option value="22">22 hour</option>
+						<option value="23">23 hour</option>
+						<option value="24">24 hour</option>
+                        </select>
+                        <b class="tooltip tooltip-bottom-right">Needed to enter the hours</b> </label>
+                    </section>
+                  </div>
+                  <div class="col col-md-12 journeyDetails" >
+				  <div class="row">
+                    <section class=" col-md-6"  style="padding:0;">
+                      <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <label class="input"> <i class="icon-append fa fa-calendar"></i>
+						  <date-picker ng-model="booking_form.pickup_date" name="one_way_pickupdate" placeholder="Select Date" callback="dateChange()" min-limit="23-12-2015" format="dd MMM, yyyy" autohide="true" required></date-picker>
+                        </label>
+						 <div style="color: red;" ng-show="booking_form_validate.one_way_pickupdate.$dirty && booking_form_validate.one_way_pickupdate.$invalid">
+							Please enter pick up date.
+						</div>
+                      </section>
+                      <section class="col col-lg-3 col-md-3 col-sm-12 col-xs-12">
+						<select name="one_way_pickuptime_hh" ng-model="booking_form_pick_time_hh" ng-init="booking_form_pick_time_hh=''" required>
+						<option value="">00</option>
+						<option value="01">01</option>
+						<option value="02">02</option>
+						<option value="03">03</option>
+						<option value="04">04</option>
+						<option value="05">05</option>
+						<option value="06">06</option>
+						<option value="07">07</option>
+						<option value="08">08</option>
+						<option value="09">09</option>
+						<option value="10">10</option>
+						<option value="11">11 </option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15 </option>
+						<option value="16">16</option>
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23">23</option>
+                        </select>
+                      </section>
+					  <section class="col col-lg-3 col-md-3 col-sm-12 col-xs-12">
+						<select name="pickuptime_mm" ng-model="booking_form_pick_time_mm" ng-init="booking_form_pick_time_mm='00'">
+						<option value="00">00</option>
+						<option value="05">05</option>
+						<option value="10">10</option>
+						<option value="15">15</option>
+						<option value="20">20</option>
+						<option value="25">25</option>
+						<option value="30">30</option>
+						<option value="35">35</option>
+						<option value="40">40</option>
+						<option value="45">45</option>
+						<option value="50">50</option>
+						<option value="50">55</option>
+                        </select>
+                      </section>
+					   <div style="color: red;" ng-show="booking_form_validate.one_way_pickuptime_hh.$dirty && booking_form_validate.one_way_pickuptime_hh.$invalid">
+							Please select time
+						</div>
+                      <div class="clearfix"></div>
+                      <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <label class="label">Pickup Location</label>
+						<div class="clearfix"></div>
+						 <a class="btn btn-success btn-xs pull-left col-sm-4" ng-click="poiAddress('one_way_pick_up_cust')">Cust</a> <a class="btn btn-info btn-xs pull-left col-sm-4" ng-click="poiAddress('one_way_pick_up_pax')">Pax</a><a class="btn btn-warning btn-xs pull-left col-sm-4" ng-click="poiAddress('one_way_pick_up')">POI&Prime;s</a> </label>
+                        <div class="clearfix" style="margin-bottom:4px;"></div>
+                        <label class="input"> <i class="icon-append fa fa-plane"></i>
+                          <input type="text" placeholder="Flight No" name="flightno" ng-model="booking_form.pickup_flight_number">
+                        </label>
+                        <label class="input pickupLocation"> 
+                          <input type="text" name="from_line1"  placeholder="Line1" ng-model="booking_form.from_address_line_1" required/>
+						  <div style="color: red;" ng-show="booking_form_validate.from_line1.$dirty && booking_form_validate.from_line1.$invalid">
+								Please enter address line 1.
+						</div>
+                          <input type="text" name="from_line2"  placeholder="Line2" ng-model="booking_form.from_address_line_2"/>
+						   <div style="color: red;" ng-show="booking_form_validate.from_line2.$dirty && booking_form_validate.from_line2.$invalid">
+								Please enter from address line 2.
+						</div>
+                          <input type="text" name="from_suburb" id="suburb" placeholder="Suburb" ng-model="booking_form.from_suburb"/>
+						   <div style="color: red;" ng-show="booking_form_validate.suburb.$dirty && booking_form_validate.suburb.$invalid">
+								Please enter from address suburb.
+							</div>
+                          <input type="text" name="from_city_name"  placeholder="City" ng-model="booking_form.from_city"/>
+						  <div style="color: red;" ng-show="booking_form_validate.from_city.$dirty && booking_form_validate.from_city.$invalid">
+								Please enter city.
+						</div>
+                        </label>
+						<a class="btn btn-success btn-xs" ng-click="addVia()">Add Via</a></label>
+						<div class="clearfix"></div>
+						<!------ Show add via div one way pick up --------------------->
+							   <div>
+							   <div class="row">
+									<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ng-repeat="via_data in via">
+										<label class="label">
+										<div class="clearfix"></div>
+										<div class="clearfix" style="margin-bottom:4px;"></div>
+										<label class="input">
+										<input type="text" placeholder="Line1" ng-model="booking_form.additional_pickup_address_from.from_address_line_1">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Line2" ng-model="booking_form.additional_pickup_address_from.from_address_line_2">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Suburb" ng-model="booking_form.additional_pickup_address_from.from_suburb">
+										</label>
+										<a class="iconSmall"><i class="fa fa-minus-circle" ng-click="removeVia()"></i></a>
+									</section>
+									</div>
+							 </div>
+					<!------ End of the Add via div  one way pick up-------------------------------->
+                      </section>
+                      <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <label class="label">Drop-off Location</label>
+						<div class="clearfix"></div>
+						<a  class="btn btn-success btn-xs pull-left col-sm-4" ng-click="poiAddress('one_way_drop_off_cust')">Cust</a> <a class="btn btn-info btn-xs pull-left col-sm-4" ng-click="poiAddress('one_way_drop_off_pax')">Pax</a><a class="btn btn-warning btn-xs pull-left col-sm-4" ng-click="poiAddress('one_way_drop_off')">Poi</a>
+						<div class="clearfix" style="margin-bottom:4px;"></div>
+                        <label class="input"> <i class="icon-append fa fa-plane"></i>
+                          <input type="text" placeholder="Flight No" name="flightno" ng-model="booking_form.dropoff_flight_number">
+                        </label>
+                        <label class="input pickupLocation">
+                          <input type="text" name="to_line1" placeholder="Line1" ng-model="booking_form.to_address_line_1" required/>
+						  <div style="color: red;" ng-show="booking_form_validate.to_line1.$dirty && booking_form_validate.to_line1.$invalid">
+								Please enter address line 1.
+							</div>
+                          <input type="text" name="to_line2" placeholder="Line2" ng-model="booking_form.to_address_line_2" />
+							<div style="color: red;" ng-show="booking_form_validate.to_line2.$dirty && booking_form_validate.to_line2.$invalid">
+								Please enter address line 2.
+							</div>
+                          <input type="text" name="suburb" id="suburb" placeholder="Suburb" ng-model="booking_form.to_subrub"/>
+                          <input type="text" name="to_city"  placeholder="City" ng-model="booking_form.to_city"/>
+                        </label>
+						<div style="color: red;" ng-show="booking_form_validate.to_city.$dirty && booking_form_validate.to_city.$invalid">
+							Please enter city.
+						</div>
+						<a class="btn btn-success btn-xs" ng-click="returnVia()">Add Via</a></label>
+						<div class="clearfix"></div>
+						<!------ Show add via div one way drop up --------------------->
+							   <div >
+							   <div class="row">
+									<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ng-repeat="return_via_data in returnvia">
+										<label class="label">
+										<div class="clearfix"></div>
+										<div class="clearfix" style="margin-bottom:4px;"></div>
+										<label class="input">
+										<input type="text" placeholder="Line1" ng-model="booking_form.additional_pickup_address_to.to_address_line_1">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Line2" ng-model="booking_form.additional_pickup_address_to.to_address_line_2">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Suburb" ng-model="booking_form.additional_pickup_address_to.to_subrub">
+										</label>
+										<a class="iconSmall"><i class="fa fa-minus-circle" ng-click="removeReturnVia()"></i></a>
+									</section>
+									</div>
+							 </div>
+					<!------ End of the Add via div -------------------------------->	
+                      </section>
+                    </section>
+                    <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-bottom:0;">
+                      <div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">
+                          <div class="panel">
+                            <div class="panel-body" style="padding:0;">
+							 <div style="color: red;" ng-show="booking_form_validate.one_way_vehicle_type.$dirty && booking_form_validate.one_way_vehicle_type.$invalid">
+								Please select a vehicle type
+							</div>
+							 <div style="color: red;" ng-show="booking_form_validate.one_way_pax_no.$dirty && booking_form_validate.one_way_pax_no.$invalid">
+								Please select pax number
+							</div>
+							 <section class="col col-lg-7 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="one_way_vehicle_type" ng-model="booking_form.car_type_id" ng-init="booking_form.car_type_id"='' required>
+								   <option value="">Car type</option>
+                                    <option value="{{car_data._id}}" ng-repeat="car_data in car_list_data">{{car_data.car_class}}</option>
+                                  </select>
+                                   </label>
+                              </section>
+                              <section class="col col-lg-5 col-md-6 col-sm-12 col-xs-12"  style="padding-left:0;" >
+                                <label class="select">
+                                  <select name="baby_seat" ng-model="booking_form_extra.extra_extra_nos1" ng-change="updatePriceAccordingToExtra(0,booking_form_extra.extra_extra_nos1)" ng-init="booking_form.extra_extra_nos=''">
+                                    <option value="">{{extras_data[0].name}}</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                               <section class="col col-lg-7 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="one_way_pax_no" ng-model="booking_form.pax_nos" ng-init="booking_form.pax_nos=''" required>
+                                    <option value="">No.of Pax</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                              <section class="col col-lg-5 col-md-6 col-sm-12 col-xs-12"  style="padding-left:0;">
+                                <label class="select">
+                                  <select name="Booster Seat" ng-model="booking_form_extra.extra_extra_nos2" ng-change="updatePriceAccordingToExtra(1,booking_form_extra.extra_extra_nos2)" ng-init="booking_form_extra.extra_extra_nos2=''">
+                                    <option value="">{{extras_data[1].name}}</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                             
+                              <section class="col col-lg-7 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="luggages" ng-model="booking_form.luggage_large_nos" ng-init="booking_form.luggage_large_nos='0'">
+                                    <option value="0">No.of Luggages</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                              <section class="col col-lg-5 col-md-6 col-sm-12 col-xs-12"  style="padding-left:0;">
+                                <label class="select">
+                                  <select name="No. of Luggages" ng-model="booking_form_extra.extra_extra_nos3" ng-change="updatePriceAccordingToExtra(2,booking_form_extra.extra_extra_nos3)" ng-init="booking_form_extra.extra_extra_nos3=''">
+                                    <option value="">{{extras_data[2].name}}</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">                              
+                          	  <div class="panel-body" style="padding:0;">							 				  
+                              <section class="col col-lg-12">
+								<label class="label col-lg-12">Driver Information</label>	
+                                <label class="select">
+                                  <select name="one_driverstatus" ng-model="booking_form.driver_status" ng-change="getDriverdetails(booking_form.driver_status)" ng-init="booking_form.driver_status=''">
+										<option value="">Driver Status</option>
+										<option value="allocate">Allocate</option>
+										<option value="allotted">Allotted</option>
+										<option value="offered">Offer</option>
+                                  </select>
+                                   </label>
+						 <div style="color: red;" ng-show="booking_form_validate.one_driverstatus.$dirty && booking_form_validate.one_driverstatus.$invalid">
+							Please select driver status.
+						</div>
+                              </section>
+							  <div ng-hide="one_way_driver_information">
+                              <section class="col col-lg-12">
+                                <label class="select">
+                                  <select name="one_way_driverid" ng-model="booking_form.driver_id" ng-init="booking_form.driver_id=''" required>
+                                    <option value="">Driver</option>
+                                    <option value="{{driver._id}}" ng-repeat="driver in driver_listing_data">{{driver.title + ' '+ driver.first_name + ' '+ driver.last_name}}</option>
+                                  </select>
+                                  </label>
+								  <div style="color: red;" ng-show="booking_form_validate.one_way_driverid.$dirty && booking_form_validate.one_way_driverid.$invalid">
+									Please select a driver.
+								</div>
+                              </section>
+							  
+							  <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label class="input">
+                                   <input type="text" name="one_way_driver_price" placeholder="Allot / Offer Price" ng-model="booking_form.driver_price" ng-blur="setDriverPrice('one_way',booking_form.driver_price)"; style="text-align:right;" required>
+                                 </label>
+								 <div style="color: red;" ng-show="booking_form_validate.one_way_driver_price.$dirty && booking_form_validate.one_way_driver_price.$invalid">
+									Please enter allot/offre price.
+								</div>
+                              </section>
+							  <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="one_way_patment_type" ng-model="booking_form.driver_payment_option" ng-init="booking_form.driver_payment_option=''" required>
+								  <option value="">Payment Option</option>
+                                    <option value="collect">Collect</option>
+									 <option value="account">Account</option>
+                                  </select>
+                                  <i></i> </label>
+								    <div style="color: red;" ng-show="booking_form_validate.one_way_patment_type.$dirty && booking_form_validate.one_way_patment_type.$invalid">
+									Please select a payment type.
+								</div>
+                              </section>
+							<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
+								<label class="textarea"> <i class="icon-append fa fa-comment"></i>
+									<textarea placeholder="Driver notes" name="comment" rows="2" ng-model="booking_form.driver_notes"></textarea>
+								</label>
+								<a class="iconSmall" href=""><i class="fa  fa-question-circle" tooltips tooltip-template="Driver notes."></i></a>
+							</section>
+							<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="inline-group">
+							<label class="checkbox">
+							<input type="checkbox" name="checkbox-inline" value="true" ng-model="booking_form.share_pax_no_for_driver">
+							<i></i>Share Pax Phone No.</label>
+							</section>
+							</div> 
+						  </div>
+						</div>
+					  </div>
+                    </section>
+                  </div>
+				  </div>
+				  <div class="col col-md-12 journeyDetails" ng-hide="return_details_div">
+				  <div class="row">
+				  <label style="padding-left:12px;">RETURN <a ng-click="populalateReturnData();"><i class="fa fa-mail-reply-all"></i></a></label>
+				  <div class="clearfix"></div>
+                    <section class=" col-md-6"  style="padding:0;">
+                      <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <label class="input"> <i class="icon-append fa fa-calendar"></i>
+                           <date-picker ng-model="booking_form.return_date" name="return_pickupdate" placeholder="Select Date" callback="dateChange()" min-limit="23-12-2015" format="dd MMM, yyyy" autohide="true" required></date-picker>
+                        </label>
+						 <div style="color: red;" ng-show="booking_form_validate.return_pickupdate.$dirty && booking_form_validate.return_pickupdate.$invalid">
+							Please enter pick up date.
+						</div>
+                      </section>
+					  <section class="col col-lg-3 col-md-3 col-sm-12 col-xs-12">
+						<select name="retrun_pickuptime_hh" ng-model="booking_form_return_pick_time_hh" ng-init="booking_form_return_pick_time_hh=''" required>
+						<option value="">00</option>
+						<option value="01">01</option>
+						<option value="02">02</option>
+						<option value="03">03</option>
+						<option value="04">04</option>
+						<option value="05">05</option>
+						<option value="06">06</option>
+						<option value="07">07</option>
+						<option value="08">08</option>
+						<option value="09">09</option>
+						<option value="10">10</option>
+						<option value="11">11 </option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15 </option>
+						<option value="16">16</option>
+						<option value="17">17</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23">23</option>
+                        </select>
+                      </section>
+					  <section class="col col-lg-3 col-md-3 col-sm-12 col-xs-12">
+						<select name="return_pickuptime_mm" ng-model="booking_form_return_pick_time_mm" ng-init="booking_form_return_pick_time_mm='00'">
+						<option value="00">00</option>
+						<option value="05">05</option>
+						<option value="10">10</option>
+						<option value="15">15</option>
+						<option value="20">20</option>
+						<option value="25">25</option>
+						<option value="30">30</option>
+						<option value="35">35</option>
+						<option value="40">40</option>
+						<option value="45">45</option>
+						<option value="50">50</option>
+						<option value="50">55</option>
+                        </select>
+                      </section>
+					  	<div style="color: red;" ng-show="booking_form_validate.retrun_pickuptime_hh.$dirty && booking_form_validate.retrun_pickuptime_hh.$invalid">
+							Please select time
+						</div>
+                      <div class="clearfix"></div>
+                      <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <label class="label">Pickup Location</label>
+						<div class="clearfix" style="margin-bottom:10px;"></div>
+						<a  class="btn btn-success btn-xs pull-left col-sm-4" ng-click="poiAddress('return_pick_up_cust')">Cust</a> <a class="btn btn-info btn-xs pull-left col-sm-4" ng-click="poiAddress('return_pick_up_pax')">Pax</a><a class="btn btn-warning btn-xs col-sm-4" ng-click="poiAddress('return_pick_up_poi')">Poi</a>
+                        <div class="clearfix" style="margin-bottom:4px;"></div>
+                        <label class="input"> <i class="icon-append fa fa-plane"></i>
+                          <input type="text" placeholder="Flight No" name="flightno" ng-model="booking_form.return_pickup_flight_number">
+                        </label>
+                        <label class="input pickupLocation"> 
+                          <input type="text" name="return_line_1"  placeholder="Line1" ng-model="booking_form.return_from_address_line_1"/>
+                          <input type="text" name="return_line_2"  placeholder="Line2" ng-model="booking_form.return_from_address_line_2"/>
+                          <input type="text" name="return_suburb"  placeholder="Suburb" ng-model="booking_form.return_subrub"/>
+                          <input type="text" name="return_city" placeholder="City" ng-model="booking_form.return_city"/>
+                        </label>
+						<a class="btn btn-success btn-xs" ng-click="returnWayPickvia()">Add Via</a></label>
+						<div class="clearfix"></div>
+						<!------ Show add via div retun  drop off --------------------->
+							 <div class="row">
+									<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ng-repeat="return_pick_up_via_data in returnwaypickvia">
+										<label class="label">
+										<div class="clearfix"></div>
+										<div class="clearfix" style="margin-bottom:4px;"></div>
+										<label class="input">
+										<input type="text" placeholder="Line1" ng-model="booking_form.aditional_pickup_address_from.return_from_address_line_1">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Line2" ng-model="booking_form.aditional_pickup_address_from.return_from_address_line_2">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Suburb" ng-model="booking_form.aditional_pickup_address.return_from.suburb">
+										</label>
+										<a class="iconSmall"><i class="fa fa-minus-circle" ng-click="removeReturnWayPickupVia()"></i></a>
+									</section>
+									</div>
+					<!------ End of the Add via div -------------------------------->
+                      </section>
+                      <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <label class="label">Drop-off Location 
+						<div class="clearfix"></div>
+						 <a class="btn btn-success btn-xs pull-left" ng-click="poiAddress('return_drop_off_cust')">Cust</a><a class="btn btn-info btn-xs pull-left" ng-click="poiAddress('return_drop_off_pax')">Pax</a> <a class="btn btn-warning btn-xs" ng-click="poiAddress('return_drop_off_poi')">Poi</a></label>
+
+                        <div class="clearfix" style="margin-bottom:4px;"></div>
+                        <label class="input"> <i class="icon-append fa fa-plane"></i>
+                          <input type="text" placeholder="Flight No" name="flightno" ng-model="booking_form.return_dropoff_flight_number">
+                        </label>
+                        <label class="input pickupLocation">
+                          <input type="text" name="line1" id="line1" placeholder="Line1" ng-model="booking_form.return_to_address_line_1"/>
+                          <input type="text" name="line1" id="line1" placeholder="Line2" ng-model="booking_form.return_to_address_line_2"/>
+                          <input type="text" name="suburb" id="suburb" placeholder="Suburb" ng-model="booking_form.return_to_subrub"/>
+                          <input type="text" name="city" id="city" placeholder="City" ng-model="booking_form.return_to_city"/>
+                        </label>
+						<a class="btn btn-success btn-xs" ng-click="returnWayDropvia()">Add Via</a></label>
+						<div class="clearfix"></div>
+						<!------ Show add via div retun  drop off --------------------->
+							    <div class="row">
+									<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ng-repeat="return_drop_via_data in returnwaydropvia">
+										<label class="label">
+										<div class="clearfix"></div>
+										<div class="clearfix" style="margin-bottom:4px;"></div>
+										<label class="input">
+										<input type="text" placeholder="Line1" ng-model="booking_form.aditional_pickup_address_from.return_from_address_line_1">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Line2" ng-model="booking_form.aditional_pickup_address_from.return_from_address_line_2">
+										</label>
+										<label class="input">
+										<input type="text" placeholder="Suburb" ng-model="booking_form.aditional_pickup_address.return_from.suburb">
+										</label>
+										<a class="iconSmall"><i class="fa fa-minus-circle" ng-click="removeReturnWayDropupVia()"></i></a>
+									</section>
+									</div>
+					<!------ End of the Add via div -------------------------------->
+                      </section>
+                    </section>
+                    <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-bottom:0;">
+                      <div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">
+                          <div class="panel">
+                            <div class="panel-body" style="padding:0;">
+							 <div style="color: red;" ng-show="booking_form_validate.return_way_vehicle_type.$dirty && booking_form_validate.return_way_vehicle_type.$invalid">
+								Please select a vehicle type
+							</div>
+							 <div style="color: red;" ng-show="booking_form_validate.return_pax_nos.$dirty && booking_form_validate.return_pax_nos.$invalid">
+								Please select pax number
+							</div>
+							
+							 <section class="col col-lg-7 col-md-6 col-sm-12 col-xs-12">
+							
+                                <label class="select">
+								 <select name="return_way_vehicle_type" ng-model="booking_form.return_car_type_id" ng-init="booking_form.return_car_type_id=''" required>
+								   <option value="">Car type</option>
+                                    <option value="{{car_data._id}}" ng-repeat="car_data in car_list_data">{{car_data.car_class}}</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                              <section class="col col-lg-5 col-md-6 col-sm-12 col-xs-12" style="padding-left:0;">
+                                <label class="select">
+                                  <select name="Baby_seat" ng-model="retun_booking_form_extra.extra_extra_nos1" ng-change="return_updatePriceAccordingToExtra(0,retun_booking_form_extra.extra_extra_nos1)" ng-model="retun_booking_form_extra.extra_extra_nos1=''">
+                                    <option value="" selected disabled>Baby Seat:</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+									<option value="9">9</option>
+									<option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                               <section class="col col-lg-7 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="return_pax_nos" ng-model="booking_form.return_pax_nos" ng-init="booking_form.return_pax_nos='0'" required>
+                                    <option value="0" selected disabled>No. of Pax</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                              <section class="col col-lg-5 col-md-6 col-sm-12 col-xs-12"  style="padding-left:0;">
+                                <label class="select">
+                                  <select name="Booster Seat" ng-model="retun_booking_form_extra.extra_extra_nos2" ng-change="return_updatePriceAccordingToExtra(1,retun_booking_form_extra.extra_extra_nos2)" ng-init="retun_booking_form_extra.extra_extra_nos2='0'">
+                                    <option value="0" selected disabled>Booster Seat</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+									<option value="9">9</option>
+									<option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                              <section class="col col-lg-7 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="No. of Luggages" ng-model="booking_form.return_luggage_large_nos" ng-init="booking_form.return_luggage_large_nos='0'">
+                                     <option value="0" selected disabled>No. of Luggages</option>
+									 <option value="0">0</option>
+                                    <option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+									<option value="9">9</option>
+									<option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                              <section class="col col-lg-5 col-md-6 col-sm-12 col-xs-12"  style="padding-left:0;">
+                                <label class="select">
+                                  <select name="return_capsules" ng-model="retun_booking_form_extra.extra_extra_nos3" ng-change="return_updatePriceAccordingToExtra(2,retun_booking_form_extra.extra_extra_nos3)" ng-init="retun_booking_form_extra.extra_extra_nos3=''">
+                                    <option value="">Capsule</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+                                    <option value="2">2</option>
+									<option value="3">3</option>
+                                    <option value="4">4</option>
+									<option value="5">5</option>
+                                    <option value="6">6</option>
+									<option value="7">7</option>
+                                    <option value="8">8</option>
+									<option value="9">9</option>
+                                    <option value="10">10</option>
+                                  </select>
+                                  <i></i> </label>
+                              </section>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="panel-group accordion">
+                        <div class="panel panel-default blue-default">                              
+                          	  <div class="panel-body" style="padding:0;">
+							  <label class="label col-lg-12"> <a class="accordion-toggle">Driver Information</a></label>
+                              <section class="col col-lg-12">
+                                <label class="select">
+                                  <select name="return_driver_status" ng-model="booking_form.return_driver_status" ng-change="return_getDriverdetails(booking_form.return_driver_status)" ng-init="booking_form.return_driver_status=''">
+                                    <option value="">Driver Status</option>
+									<option value="allocate">Allocate</option>
+									<option value="allotted">Allotted</option>
+									<option value="offered">Offer</option>
+                                  </select>
+                                   </label>
+                              </section>
+							  <div ng-hide="return_way_driver_information">
+                              <section class="col col-lg-12">
+                                <label class="select">
+                                  <select name="return_driver_name" ng-model="booking_form.return_driver_id" ng-init="booking_form.return_driver_id='0'">
+                                    <option value="0">Driver</option>
+                                    <option value="{{driver._id}}" ng-repeat="driver in driver_listing_data">{{driver.title + ' '+ driver.first_name + ' '+ driver.last_name}}</option>
+                                  </select>
+                                  </label>
+								  <div style="color: red;" ng-show="booking_form_validate.return_driver_name.$dirty && booking_form_validate.return_driver_name.$invalid">
+									Please select driver name.
+								</div>
+                              </section>
+							  <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label class="input">
+                                   <input type="text" name="returndriverprice" placeholder="Offer / Allot Price" ng-model="booking_form.return_driver_price" ng-blur="setDriverPrice('return_way',booking_form.driver_price)";  style="text-align:right;" required>
+                                 </label>
+								 <div style="color: red;" ng-show="booking_form_validate.returndriverprice.$dirty && booking_form_validate.returndriverprice.$invalid">
+									Please enter driver price.
+								</div>
+                              </section>
+							  <section class="col col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label class="select">
+                                  <select name="return_patment_type" ng-model="booking_form.return_driver_payment_type" ng-init="booking_form.return_driver_payment_type=''">
+										<option value="">Payment Option</option>
+										<option value="collect">Collect</option>
+										<option value="account">Account</option>
+                                  </select>
+                                  <i></i> </label>
+								   <div style="color: red;" ng-show="booking_form_validate.return_patment_type.$dirty && booking_form_validate.return_patment_type.$invalid">
+									Please enter driver price.
+								</div>
+                              </section>
+							<section class="col col-lg-12 col-md-6 col-sm-12 col-xs-12">
+								<label class="textarea"> <i class="icon-append fa fa-comment"></i>
+								<textarea placeholder="Driver notes" name="comment" rows="2" ng-model="return_driver_notes"></textarea>
+								</label>
+								<a class="iconSmall" href=""><i class="fa  fa-question-circle"  tooltips tooltip-template="Email will be used to login."></i></a>
+							</section>
+							<section class="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
+								<div class="inline-group">
+							<label class="checkbox">
+							<input type="checkbox" name="checkbox-inline" value="true" ng-model="booking_form.return_share_pax_no_for_driver">
+							<i></i>Share Pax Phone No.</label>
+							</section>
+							</div>
+						  </div>
+					  </div>
+				  </div>
+				</section>
+                  </div>
+				  </div>
+			 
+			  </fieldset>
+              <div class="message"><i class="rounded-x fa fa-check"></i>
+                <p>Thanks for your order!<br>
+                  We'll contact you very soon.</p>
+              </div>
+			</div>
+		  </div>
+          <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+		   <div class="bms-form">
+              <header class="fare_header">Step 3: Fare Guideline</header>
+              <fieldset>
+                <div class="row">
+                  <div class="col-md-12 col-sm-6 col-xs-12 fareGuideline1" >
+					<label class="label">Fare and Extras</label>
+                    <section>
+                      <label class="fare_input">
+						<label>Base Fare &nbsp; <a class="iconSmall1" ng-click="BaseFareModal('fare');"><i class="fa fa-question-circle" ></i></a></label>
+                        <input type="text" name="basefare" placeholder="0.00"  ng-model="booking_form.base_price" valid-number ng-blur="oneWayFareCalculation('','common',booking_form.base_price)" required>
+                        <input type="text" name="basefare"  placeholder="0.00" class="basefare2" ng-hide="return_fare_div" ng-model="booking_form.return_base_price" ng-blur="returnWayFareCalculation('','common',booking_form.return_base_price)">
+                      </label>
+                    </section>
+                    
+                    <section ng-repeat="fare_extra_data in booking_form.extra_prices">
+                      <label class="fare_input">
+					  <label>{{fare_extra_data.name}}</label>
+                        <input type="text" name="flatfare1" placeholder="0.00"  ng-model="booking_form.extra_prices.extra_price[$index+1]" ng-blur="oneWayFareCalculation($index,'extra',booking_form.extra_prices.extra_price[$index+1])">
+						<input type="text" name="flatfare2" placeholder="0.00"  ng-model="booking_form.return_extra_prices.extra_price[$index+1]"  class="basefare2" ng-hide="return_fare_div" ng-blur="returnWayFareCalculation($index,'extra',booking_form.return_extra_prices.extra_price[$index+1])">
+                      </label>
+                    </section>
+                   
+					<div class="clearfix"></div>
+					<!--------- Add extra field for fare chart --------------------->
+					 <section>
+                      <label class="fare_input" data-ng-repeat="choice in choices">
+					  <label> <input type="text" name="discount" placeholder="New Extra" ng-model="booking_form.extra_prices_val" class="extra"></label>
+                        <input type="text" name="discount" placeholder="0.00">
+						<i class="fa fa-minus-circle remove"  ng-show="$last" ng-click="removeChoice()"></i>
+                      </label>
+					</section>
+					<section>
+					<a class="btn btn-success btn-xs pull-left" ng-click="addNewChoice()";><i class="fa fa-plus-circle" ></i> Add an extra</a>
+					</section>
+					 <section>
+                      <label class="fare_input">
+					  <label><strong>Total Fare</strong></label>
+                        <input type="text" name="tax" placeholder="0.00" ng-model="booking_form.total_fare | number:2">
+						<input type="text" name="tax" placeholder="0.00" ng-model="booking_form.return_total_fare | number:2" class="basefare2" ng-hide="return_fare_div">
+                      </label>
+                    </section>
+					<!--------- end of add extra field ----------------------------->
+					<div class="clearfix"></div>
+					<label class="label">Expenses</label>
+					<section>
+                      <label class="fare_input">
+					  <label>Driver Fee</label>
+                        <input type="text" name="tax" placeholder="0.00" ng-model="booking_form.one_way_driver_fee" ng-blur="oneWayFareCalculation('','expenses',booking_form.one_way_driver_fee)">
+						<input type="text" name="tax" placeholder="0.00"  ng-model="booking_form.return_driver_fee" ng-blur="returnWayFareCalculation('','expenses',booking_form.return_driver_fee)" class="basefare2" ng-hide="return_fare_div">
+                      </label>
+                    </section>
+
+                    <section>
+                      <label class="fare_input">
+					  <label>Other Expenses</label>
+                        <input type="text" name="expenses" placeholder="0.00" ng-model="booking_form.one_way_other_expenses" ng-blur="oneWayFareCalculation('','expenses',booking_form.one_way_other_expenses)">
+						<input type="text" name="expenses" placeholder="0.00" ng-model="booking_form.return_other_expenses" ng-blur="returnWayFareCalculation('','expenses',booking_form.return_other_expenses)" class="basefare2" ng-hide="return_fare_div">
+                      </label>
+                    </section>
+					
+					<!--------- Add extra field for fare chart --------------------->
+					 <section>
+                      <label class="fare_input" data-ng-repeat="expense in expenses">
+					  <label> <input type="text" name="discount" placeholder="New Expense" class="extra"></label>
+                        <input type="text" name="discount" placeholder="0.00">
+						<a class="fa fa-minus-circle remove" ng-show="$last" ng-click="removeNewExpenses()"></a>
+                      </label>
+					</section>
+					<section>
+					<a class="btn btn-success btn-xs pull-left" ng-click="addExpensesField()";><i class="fa fa-plus-circle" ></i> Add an expenses</a>
+					</section>
+					<!--------- end of add extra field ----------------------------->
+					 <section>
+                      <label class="fare_input">
+					  <label><strong>Total Expenses</strong></label>
+                        <input type="text" name="expenses" placeholder="0.00" ng-model="booking_form.one_way_total_expenses|number:2" ng-change="oneWayFareCalculation(booking_form.one_way_total_expenses)">
+						<input type="text" name="return_expenses" placeholder="0.00" ng-model="booking_form.return_total_expenses|number:2" class="basefare2" ng-hide="return_fare_div">
+                      </label>
+                    </section>
+					<div class="clearfix"></div>
+					<label class="label">Net Profit/Loss</label>
+					<div class="bg-light">					
+                    <section>
+                      <label class="fare_input">
+					  <label><strong>Net Profit/Loss</strong></label>
+                      <input type="text" name="profit_loss" ng-model="booking_form.profit_and_loss | number:2"  ng-style="myStyle" placeholder="0.00">
+						<input type="text" name="return_profit_loss" ng-model="booking_form.return_profit_and_loss | number:2" placeholder="0.00" class="basefare2" ng-hide="return_fare_div">
+                      </label>
+                    </section>
+					
+					</div>
+                  </div>
+                </div>
+              </fieldset>
+			  </div>
+            <!--step 3 end--> 
+          </div>
+		  <div class="clearfix"></div>
+          <!--step 2 end--> 
+          <button type="submit" ng-hide="booking_save" value="Save" class="save">SAVE</button>
+		  <span ng-hide="save_loder_image" class="loader"><a class="iconSmall"><i class="fa fa-spinner fa-pulse"></i></a></span>
+        </div>
+      </div>
+	  </div>
+	  </form>
+		
+  </div>
+</div>
+<modal title="Point of interest" visible="poi_modal_pick_up_from">
+        <div class="row"  ng-repeat="point_of_interest_pick_up in point_of_interest_data">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('poi_pick_up', point_of_interest_pick_up)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{point_of_interest_pick_up.line_1}} {{point_of_interest_pick_up.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Point of interest" visible="poi_modal_drop_off_from">
+        <div class="row"  ng-repeat="point_of_interest_drop_off in point_of_interest_data_for_drop_off">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('poi_drop_off', point_of_interest_drop_off)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{point_of_interest_drop_off.line_1}} {{point_of_interest_drop_off.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Customer Addresses" visible="poi_modal_cust_from"> 
+        <div class="row" ng-repeat="poi_one_way_pick_up_cust in cust_data">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('poi_pick_up_cust', poi_one_way_pick_up_cust)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{poi_one_way_pick_up_cust.job_details.from_address.line_1}} {{poi_one_way_pick_up_cust.job_details.from_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Customer Addresses" visible="poi_modal_cust_to"> 
+        <div class="row" ng-repeat="poi_one_way_drop_off_cust in one_way_drop_off_cust">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('poi_drop_off_cust', poi_one_way_drop_off_cust)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{poi_one_way_drop_off_cust.job_details.to_address.line_1}} {{poi_one_way_drop_off_cust.job_details.to_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Passenger Addresses" visible="poi_modal_one_way_pick_up_pax_from">
+        <div class="row" ng-repeat="data_pax in pax_data">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('pax_data', data_pax)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{data_pax.from_address.line_1}} {{data_pax.from_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Passenger Addresses" visible="drop_off_modal_one_way_pick_up_pax_from">    
+        <div class="row" ng-repeat="drop_off_pax in drop_off_pax_data">   
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('drop_off_pax_data', drop_off_pax)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{drop_off_pax.to_address.line_1}} {{drop_off_pax.to_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<!------------------------------------------------------------------------------------------------------------------>
+	<modal title="Point of interest" visible="poi_modal_pick_up_from_for_return">
+        <div class="row"  ng-repeat="point_of_interest_return in point_of_interest_data_for_return">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('return_poi_pick_up', point_of_interest_return)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{point_of_interest_return.line_1}} {{point_of_interest_return.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Point of interest" visible="poi_modal_drop_off_from_for_return">
+        <div class="row"  ng-repeat="drop_off_for_return in poi_data_for_drop_off_for_return">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('return_poi_drop_off', drop_off_for_return)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{drop_off_for_return.line_1}} {{drop_off_for_return.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Customer History" visible="poi_modal_cust_from_return"> 
+        <div class="row" ng-repeat="return_cust in return_cust_data">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('return_pick_up_cust', return_cust)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{return_cust.job_details.from_address.line_1}} {{return_cust.job_details.from_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Customer History" visible="return_modal_cust_to"> 
+        <div class="row" ng-repeat="return_drop_off_cust_data in return_drop_off_cust">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('return_poi_drop_off_cust', return_drop_off_cust_data)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{return_drop_off_cust_data.job_details.to_address.line_1}} {{return_drop_off_cust_data.job_details.to_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Passenger Addresses" visible="poi_modal_return_pick_up_pax_from">
+        <div class="row" ng-repeat="data_pax in pax_data">
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('return_pick_up_pax_data', data_pax)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{data_pax.from_address.line_1}} {{data_pax.from_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<modal title="Passenger Addresses" visible="drop_off_modal_return_pick_up_pax_from">    
+        <div class="row" ng-repeat="return_drop_off_pax in return_drop_off_pax_data">   
+            <section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="" ng-model="poi_value" ng-click="setPoivalue('return_drop_off_pax_data', return_drop_off_pax)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{return_drop_off_pax.to_address.line_1}} {{return_drop_off_pax.to_address.line_2}}</label>
+            </section>
+        </div>
+    </modal>
+	<!------------ Modal for view Base fare previous history--------------->
+	<modal title="Base fare" visible="base_fare_history">
+		<div class="col-lg- col-md-12 col-sm-12 col-xs-12" style="padding-left:0px; padding-right:0px;"> 
+		<header>Estimate fare</header>
+		<section class="col col-sm-2 col-xs-12">
+                <input type="radio" name="radio-inline" value="{{calculate_base_fare}}" ng-model="base_fare_val" ng-click="setBaseFare(base_fare_val)">
+            </section>
+            <section class="col col-sm-10 col-xs-12">
+                <label>{{calculate_base_fare}}</label>
+            </section>
+		<fieldset>
+		</fieldset>
+		</div>
+	</modal>
+	<!------------ Modal for Bookinf Sucess--------------->
+	<modal title="Booking sucess" visible="booking_sucess_modal">
+		<div class="row" ng-repeat="booking_information in booking_success_information.jobs">   
+			<section class="col col-sm-10 col-xs-12">
+				<label>Job Id&nbsp;: {{booking_information.job_id}}</label>
+			</section>
+			 <section class="col col-sm-10 col-xs-12">
+				<label ng-if="booking_success_information.booking_type == 'one_way'">Booking Type&nbsp;:&nbsp;One way</label>
+				<label ng-if="booking_success_information.booking_type == 'return'">Booking Type&nbsp;:&nbsp;Return</label>
+				<label ng-if="booking_success_information.booking_type == 'hourly'">Booking Type&nbsp;:&nbsp;Hourly</label>
+			</section>
+			<section class="col col-sm-10 col-xs-12">
+				<label>Pick-up Data&nbsp;: {{booking_information.pickup_date_time.pickup_date | date : 'dd-MM-yyyy'}}</label>
+			</section>
+			<section class="col col-sm-10 col-xs-12" ng-if="booking_information.pickup_date_time.pickup_time">
+				<label>Pick-up Time&nbsp;: {{booking_information.pickup_date_time.pickup_time}}</label>
+			</section>
+		</div>
+		<div class="col-md-12" style="padding:0;">
+			<div class="form-group pull-left">
+				<button style="margin-top:0px;" class="btn btn-primary btn-md">
+					<a href="#/edit-job/{{booking_success_information.booking_id}}">Edit</a>
+				</button>
+			</div>
+			<div class="form-group pull-right">
+				<button style="margin-top:0px;" class="btn btn-primary btn-md" ng-click="close();">Close</button>
+			</div>
+		</div> 
+	</modal>
+	
+	<modal title="Profilt" visible="booking_profit">
+		<div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" style="padding-left:0px; padding-right:0px;"> 
+		<header>Profilt</header>
+		<fieldset>
+		</fieldset>
+		</div>
+	</modal>
+	
+	<modal title="Loss" visible="booking_loss">
+		<div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" style="padding-left:0px; padding-right:0px;"> 
+		<header>Loss</header>
+		<fieldset>
+		</fieldset>
+		</div>
+	</modal>
+
+</body>
+</html>

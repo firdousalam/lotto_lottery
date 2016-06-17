@@ -1,0 +1,37 @@
+<div class="tab-pane fade in active"  ng-controller="bookingListGridViewController" ng-cloak>
+	<div class="panel panel-green" style="margin:7px 0;">
+		<div class="panel-heading">
+			<h3 class="panel-title"><i class="fa fa-globe"></i> Jobs Between - {{dt_from | date : 'dd-MM-yyyy'}} & {{dt_to | date : 'dd-MM-yyyy'}}</h3> 
+		</div>
+		<div class="table-responsive">
+			<table class="table table-bordered table-striped">
+				<thead class="jobs">
+					<tr class="blueLine">
+						<th><i class="fa fa-arrow-left" ng-click="getGridViewListingPrevNext(dt_from, 'previous')"></i>14 Days<i class="fa fa-arrow-right" ng-click="getGridViewListingPrevNext(dt_to, 'next')"></i></th>
+						<th ng-repeat="time in time_arr">{{time.start}}</th>
+					</tr>
+				</thead>
+				<tbody ng-hide="tab_res1">
+					<tr>
+						<td colspan="25"><div ng-show="loading1" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 99;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div></td>
+					</tr>
+				</tbody>
+				<tbody ng-show="tab_res1">
+					<tr ng-repeat="day in days">
+						<th>{{day | date : 'dd-MM-yyyy'}}</th>
+						<td class="selectGreen" ng-repeat="time in time_arr">
+							<span ng-repeat="grid_data in booking_grid_list_data" ng-if="(day | date : 'MM-dd-yyyy')==(grid_data.jobs.job_date | date : 'MM-dd-yyyy')">
+								<p ng-if="time.start<=grid_data.jobs.pickup_date_time.pickup_time && time.to>grid_data.jobs.pickup_date_time.pickup_time">
+									<a ng-click="addTab('Job ID - '+grid_data.jobs.job_id,'../repo/templates/edit_job.html',grid_data.booking_id)" tooltips tooltip-side="bottom" tooltip-template="Job ID : {{grid_data.jobs.job_id}}</br>Job Status : {{grid_data.jobs.job_status | uppercase}}</br>PAX : {{grid_data.jobs.pax_title}}&nbsp;{{grid_data.jobs.pax_first_name}}&nbsp;{{grid_data.jobs.pax_last_name}}</br>Driver : {{grid_data.jobs.driver[0].driver_id.title}} {{grid_data.jobs.driver[0].driver_id.first_name}} {{grid_data.jobs.driver[0].driver_id.last_name}}</br>Driver Status : {{grid_data.jobs.driver_status | uppercase}}</br>Pickup : {{grid_data.jobs.from_address.line_1}}&nbsp;{{grid_data.jobs.from_address.line_2}}&nbsp;{{grid_data.jobs.from_address.city}}</br>Destination : {{grid_data.jobs.to_address.line_1}}&nbsp;{{grid_data.jobs.to_address.line_2}}&nbsp;{{grid_data.jobs.to_address.city}}</br>Date : {{grid_data.jobs.pickup_date_time.pickup_date | date : 'dd-MM-yyyy'}}</br>Time : {{grid_data.jobs.pickup_date_time.pickup_time}}</br>Fare : {{grid_data.jobs.fare[0].total_fare}}</br>Payment Status : {{grid_data.jobs.payment_status | uppercase}}">
+										<span ng-if="grid_data.jobs.job_status == 'confirmed'" class="label label-success">{{grid_data.jobs.pickup_date_time.pickup_time}}</span> 
+										<span ng-if="grid_data.jobs.job_status != 'confirmed'" class="label label-danger">{{grid_data.jobs.pickup_date_time.pickup_time}}</span>
+									</a>
+								</p>
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

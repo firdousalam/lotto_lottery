@@ -1,0 +1,82 @@
+<div ng-include src="'admin/header.html'" ng-cloak></div>
+<div class="container" style="margin-top:10% !important" ng-cloak>
+
+	<div class="row">
+		<div class="col-sm-3" ng-repeat="cars in all_car_listing">
+    	    <div class="hero-widget well well-sm">
+                 <div class="options" >
+                {{cars.car_class}}
+                </div>
+                <div class="text" ng-repeat="car_extrs in cars.extras">
+				<div ng-repeat="extra_type in all_extras" ng-if="extra_type._id==car_extrs.extra_type_id">
+                    <var>NAME : {{extra_type.name}} | </var>
+                    <label class="text-muted">PRICE :{{car_extrs.price}} | </label>
+					<label class="text-muted" ng-click="delete_extra_from_car_collection(car_extrs.extra_type_id,cars._id);"><i class="fa fa-trash-o"></i></label>
+				</div>
+                </div>
+                
+            </div>
+		</div>
+        
+	</div>
+	<div class="row row-centered">
+    	<div class="col-md-6 col-centered login" style="margin-top:5%;">
+            <div class="panel with-nav-tabs panel-default">
+             <!--   <div class="panel-heading">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" ng-class="{active:isSet(1)}" ng-click="setTab(1)">Customer</a></li>
+                            <li><a data-toggle="tab" ng-class="{active:isSet(2)}" ng-click="setTab(2)">Admin</a></li>
+                            
+                        </ul>
+                </div>-->
+				<div class="alert alert-danger" ng-repeat="error in errors">
+                   <strong>{{error}}</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content">
+                        <div  class="tab-pane fade  in active"><form class="reg-page" name="add_extra_car_wise" novalidate>
+                    <div class="reg-header">
+                        <h2>Add extra against car</h2>
+                    </div>
+				
+                   <div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"></span>
+                       <select class="form-control" id="title" name="title" ng-model="add_extra_form_car_wise.id" required>
+													<option  value="">Select car type</option>
+													<!--<option value="Admin">Admin</option>-->
+													<option ng-repeat="car in all_car_listing" value="{{car._id}}">{{car.car_class}}</option>
+													
+												</select>
+                    </div>
+					<div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"></span>
+                       <select class="form-control" id="title" name="title" ng-model="add_extra_form_car_wise.extra_type_id" required>
+													<option  value="">Select extra type</option>
+													<!--<option value="Admin">Admin</option>-->
+													<option ng-repeat="extra in all_extras" value="{{extra._id}}">{{extra.name}}</option>
+												
+												</select>
+                    </div>
+					<div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"></span>
+                        <input type="number" class="form-control" name="price" placeholder="Enter price" ng-model="add_extra_form_car_wise.extra_price" ng-model-options="{ updateOn: 'blur' }" required>
+                    </div>
+					<div class="alert alert-danger" ng-show="add_extra_car_wise.price.$dirty && add_extra_car_wise.price.$invalid" > Please enter price.</div>
+                    <div class="row">
+                       
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-info pull-right" ng-click="add_extras_car_wise();" >ADD</button>
+                        </div>
+                    </div>
+</form>
+                    
+
+                   
+                </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>

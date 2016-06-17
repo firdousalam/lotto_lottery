@@ -1,0 +1,11 @@
+{
+  "name": "lotto",
+  "version": "1.0.0",
+  "description": "None",
+  "main": "app.js",
+  "author": "tier5",
+  "license": "ISC",
+  "dependencies": {
+   
+  }
+}

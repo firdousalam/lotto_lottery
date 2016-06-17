@@ -1,0 +1,1089 @@
+<div ng-controller="customer" ng-cloak>
+	<div class="row">
+		<div class="col-lg-12" style="margin-top:16px; min-height:750px;">
+			<div class="panel panel-green margin-bottom-10">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-tasks"></i> Customers
+						<button type="button" ng-click="openAddCustomer()" class="btn btn-default btn-xs pull-right"><i class="fa fa-plus-square"></i>&nbsp;Add a New Customer</button>&nbsp;&nbsp;
+						<i class="fa fa-file-pdf-o fa-2x pull-right" ng-click="openGenerateCustomerPDFData()" style="cursor:pointer;" tooltips tooltip-side="right" tooltip-template="Export customer data to PDF format."></i>&nbsp;&nbsp;
+						<i class="fa fa-file-excel-o fa-2x pull-right" ng-click="generateCustomerCSVData()" style="cursor:pointer;" tooltips tooltip-side="right" tooltip-template="Export customer data to CSV format."></i>&nbsp;&nbsp;
+					</h3>
+				</div>		
+				<!-- Search Box. -->
+				<div class="panel-body text-center">
+					<div class="col-sm-4 col-sm-offset-4">
+						<div id="imaginary_container">
+							<div class="input-group stylish-input-group">
+								<input type="text" class="form-control" ng-model="search" placeholder="Search">
+								<span class="input-group-addon">
+									<button type="submit"> <span class="glyphicon glyphicon-search"></span> </button>
+								</span> 
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered table-hover">
+						<thead>
+							<tr>
+								<th></th>
+								<!--<th ng-click="sortCustomerTableBy('customer_id')">Customer ID&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='customer_id'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='customer_id'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>-->
+								<th ng-click="sortCustomerTableBy('name')">Customer Name&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+								<th ng-click="sortCustomerTableBy('type')">Customer Type&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+								<th ng-click="sortCustomerTableBy('payment_type')">Payment Type&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='payment_type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='payment_type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+								<th><p class="text-right">Invoice Frequency</p></th>
+								<th><p class="text-right">Invoice Surcharge (%)</p></th>
+								<th><p class="text-right">Discount (%)</p></th>
+								<th><p class="text-right">Include Taxes&nbsp;<i class="fa fa-question-circle" style="color:#fff;" tooltips tooltip-side="right" tooltip-template="If yes, local taxes would be included in the fare. If No, tax would be calulated and added to the total fare."></i></th>
+								<th ng-click="sortCustomerTableBy('created_on')"><p class="text-right">Created On&nbsp;<span class="glyphicon sort-icon" ng-show="sortKey=='created_on'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span><span class="glyphicon sort-icon" ng-hide="sortKey=='created_on'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></br>(dd-mm-yyyy)</p></th>
+								<th class="width-200"><p class="text-right">Action</p></th>
+							</tr>
+						</thead>
+						<tbody ng-hide="custRes">
+							<tr>
+								<td colspan="11"><div ng-show="custLoader" style="position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat;"></div></td>
+							</tr>
+						</tbody>
+						<tbody ng-show="custRes">
+							<tr dir-paginate="customer in customer_listing_data|orderBy:sortKey:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+								<tr><td colspan="11" ng-show="!customer_listing_data.length" style="align:center"><b>No Data Available.</b></td></tr>
+								<tr ng-repeat-start="customer in customer_listing_data|orderBy:sort_table:reverse|filter:search|itemsPerPage:selected_search_type_per_page">
+									<td><button class="btn btn-info btn-xs" ng-click="showContacts = ! showContacts"><i class="fa fa-user"></i></button></td>
+									<!--<td>{{::customer.customer_id}}</td>-->
+									<td><strong>{{::customer.name}}</strong></td>
+									<td>{{::customer.type | uppercase}}</td>
+									<td><span ng-if="customer.payment_type=='invoice'">INVOICE</span><span ng-if="customer.payment_type=='collect'">COLLECT</span><span ng-if="customer.payment_type=='credit_card'">CHARGE CREDIT CARD</span></td>
+									<td><p class="text-right"><span ng-if="customer.invoice_frequency">{{::customer.invoice_frequency}}&nbsp;Days</span><span ng-if="!customer.invoice_frequency">-</span></p></td>
+									<td><p class="text-right"><span ng-if="customer.invoice_surcharge_percentage>0">{{::customer.invoice_surcharge_percentage|currency:''}}&nbsp;%</span><span ng-if="!customer.invoice_surcharge_percentage">-</span></p></td>
+									<td><p class="text-right"><span ng-if="customer.invoice_discount_percentage>0">{{::customer.invoice_discount_percentage|currency:''}}&nbsp;%</span><span ng-if="!customer.invoice_discount_percentage">-</span></p></td>
+									<td><p class="text-right"><span ng-if="customer.include_taxes && customer.include_taxes=='top_of_fare'">YES</span><span ng-if="customer.include_taxes && customer.include_taxes=='within_the_fare'">NO</span><span ng-if="!customer.include_taxes">-</span></p></td>
+									<td><p class="text-right">{{::customer.created_on | date:'dd-MM-yyyy'}}</p></td>
+									<td ng-init="customer_array_index =$index" class="width-200">
+										<!-- button to edit -->
+										<p class="text-right">
+											<button type="button" class="btn btn-warning btn-xs" ng-click="openEditCustomer(customer);"><i class="fa fa-pencil"></i> Edit</button>
+										</p>
+									</td>
+								</tr>
+							</tr>
+							<tr ng-repeat-end>
+								<td colspan="12" class="mainBlocktable" ng-show="showContacts">
+									<div class="panel panel-green margin-bottom-30 greenBlock" style="border-right:0;"><span class="listingArrow"><img src="http://www.limokit.com/bms_clients/repo/images/listing-arrow.png" alt=""/></span>
+										<div class="panel-heading">
+											<h3 class="panel-title"><i class="fa fa-user"></i>&nbsp;&nbsp;Contacts for <u><em>{{::customer.name}}</u></em>
+												<button class="btn btn-default btn-xs pull-right" ng-click="openAddCustomerContacts(customer._id)"><i class="fa fa-plus-square"></i> Add a New Contact</button>
+											</h3>
+										</div>
+										<div class="table-responsive">
+											<table class="table">
+												<thead>
+													<tr class="active">
+														<th>&nbsp;</th>
+														<th>Type</th>
+														<th>Name</th>
+														<th>Email ID</th>
+														<th>Password</th>
+														<th>Public Preferences</th>
+														<th>Private Preferences</th>
+														<th>Added On</th>
+														<th class="width-200"><p class="text-right">Action</p></th>
+													</tr>
+												</thead>
+												<tbody>
+													<!-- this div is used to show details of customer (second level type data)	-->	
+													<tr><td colspan="11" ng-show="!customer.contacts.length" style="align:center"><b>No Data Available.</b></td></tr>
+													<tr ng-repeat-start="customer_contact in customer.contacts | orderBy:'first_name'">
+														<td style="width:7%">
+															<button class="btn btn-warning btn-xs" ng-click="showContactPhone = ! showContactPhone; showContactAddress = false;"><i class="fa fa-phone"></i></button>&nbsp;<button class="btn btn-warning btn-xs" ng-click="showContactPhone = false; showContactAddress = ! showContactAddress;"><i class="fa fa-home"></i></button>
+														</td>
+														<td>{{::customer_contact.contact_type | uppercase}}</td>
+														<td><strong>{{::customer_contact.name.title}}&nbsp;{{::customer_contact.name.first_name}}&nbsp;{{::customer_contact.name.last_name}}</strong></td>
+														<td>{{::customer_contact.email}}</td>
+														<td><span ng-if="!customer_contact.password">-</span>{{::customer_contact.password}}</td>
+														<td>{{::customer_contact.public_preferences}}<span ng-if="!customer_contact.public_preferences">-</span></td>
+														<td>{{::customer_contact.private_preferences}}<span ng-if="!customer_contact.private_preferences">-</span></td>
+														<td>{{::customer_contact.created_on | date : "dd-MM-yyyy"}}</td>
+														<td>
+															<p class="text-right">
+																<button type="button" class="btn btn-warning btn-xs" ng-click="openEditCustomerContacts(customer_contact)"><i class="fa fa-pencil"></i> Edit</button>
+															</p>
+														</td>
+													</tr>
+													<tr ng-repeat-end>
+														<td colspan="12" class="subBlocktable" ng-show="showContactPhone">
+															<div class="panel panel-blue margin-bottom-40 blueBlock">
+																<span class="listingArrow"><img src="http://www.limokit.com/bms_clients/repo/images/listing-arrow.png" alt=""/></span>
+																<div class="panel-heading">
+																	<h3 class="panel-title"><i class="fa fa-phone"></i>&nbsp;&nbsp;Phone Numbers for <u><em>{{::customer_contact.name.title}}&nbsp;{{::customer_contact.name.first_name}}&nbsp;{{::customer_contact.name.last_name}}</em></u>
+																	<button class="btn btn-default btn-xs pull-right" ng-click="openAddCustomerContactPhone(customer_contact._id);"><i class="fa fa-plus-square"></i> Add New Phone</button>
+																	</h3>
+																</div>
+																<div class="table-responsive" style="border-right:0px !important;">
+																	<table class="table">
+																		<thead>
+																			<tr class="active">
+																				<th>Number Type</th>
+																				<th>Calling Code</th>
+																				<th>Number</th>
+																				<th class="width-200"><p class="text-right">Action</p></th>
+																			</tr>
+																		</thead>
+																		<tbody>
+																		<!-- showing all the contact details of user -->
+																			<tr><td colspan="4" ng-show="!customer_contact.phone.length" style="align:center"><b>No Data Available.</b></td></tr>
+																			<tr  ng-repeat="customer_phone in customer_contact.phone">																		
+																				<td><strong>{{::customer_phone.type | uppercase}}</strong></td>
+																				<td>+{{::customer_phone.calling_code}}</td>
+																				<td>{{::customer_phone.number}}</td>
+																				<td> 
+																					<p class="text-right">
+																						<!-- button to edit -->
+																						<button type="button" class="btn btn-warning btn-xs" ng-click="openEditCustomerContactPhone(customer_phone, customer_contact._id, customer._id);"><i class="fa fa-pencil"></i> Edit</button>
+																						&nbsp;
+																						<!-- button to delete -->
+																						<button class="btn btn-danger btn-xs" ng-click="deleteCustomerContactPhone(customer_contact._id, customer_phone._id);" ng-confirm-click="Are you sure you want to delete?"><i class="fa fa-trash-o"></i> Delete</button>
+																					</p>
+																				</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</div>
+															</div>
+														</td>
+														<td colspan="12" class="subBlocktable" ng-show="showContactAddress">
+															<div class="panel panel-blue margin-bottom-40 blueBlock"><span class="listingArrow"><img src="http://www.limokit.com/bms_clients/repo/images/listing-arrow.png" alt=""/></span>
+																<div class="panel-heading">
+																	<h3 class="panel-title"><i class="fa fa-home"></i>&nbsp;&nbsp;Addresses for <u><em>{{::customer_contact.name.title}}&nbsp;{{::customer_contact.name.first_name}}&nbsp;{{::customer_contact.name.last_name}}</u></em>
+																		<button class="btn btn-default btn-xs pull-right"  ng-click="openAddCustomerContactAddress(customer_contact._id)"><i class="fa fa-plus-square"></i> Add New Address</button>
+																	</h3>
+																</div>
+																<div class="table-responsive" style="border-right:0px !important;">
+																	<table class="table">
+																		<thead>
+																			<tr class="active">
+																				<th>Type</th>
+																				<th>Label</th>
+																				<th>Line 1</th>
+																				<th>Line 2</th>
+																				<th>Suburb/City</th>
+																				<th>State</th>
+																				<th>Post Code</th>
+																				<th>Country</th>
+																				<th class="width-200"><p class="text-right">Action</p></th>
+																			</tr>
+																		</thead>
+																		<tbody>
+																			<!-- this div is used to show details of customer (second level type data)	-->	
+																			<tr><td colspan="9" ng-show="!customer_contact.address.length" style="align:center"><b>No Data Available.</b></td></tr>
+																			<tr ng-repeat="customer_addr in customer_contact.address">
+																				<td>{{::customer_addr.type | uppercase}}</td>
+																				<td><strong>{{::customer_addr.label}}</strong></td>
+																				<td>{{::customer_addr.line_1}}</td>
+																				<td>{{::customer_addr.line_2}}<span ng-if="!customer_addr.line_2">-</span></td>
+																				<td>{{::customer_addr.city}}</td>
+																				<td>{{::customer_addr.state}}</td>
+																				<td>{{::customer_addr.post_code}}</td>
+																				<td>{{::customer_addr.country}}</td>
+																				<td>
+																					<p class="text-right">
+																						<button type="button" class="btn btn-warning btn-xs" ng-click="openEditCustomerContactAddress(customer_addr, customer_contact._id, customer._id)"><i class="fa fa-pencil"></i> Edit</button>
+																						&nbsp;
+																						<button class="btn btn-danger btn-xs" ng-click="deleteCustomerContactAddress(customer_contact._id, customer_addr._id);" ng-confirm-click="Are you sure you want to delete?"><i class="fa fa-trash-o"></i> Delete</button>
+																					</p>
+																				</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</div>
+															</div>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="pull-left">
+				<div class="dataTables_length" id="dataTables-example_length">
+					<div class="bms-form" style="border:0;">
+						<label>Show</label>
+						<label class="select">
+							<select ng-model="selected_search_type_per_page" 
+											ng-options="search.value as search.name for search in page_per_pagination" 
+											ng-init="selected_search_type_per_page=selected_page_pagination">
+												<option value="">Select no of rows</option>
+							</select>
+							<i></i>
+						</label>
+					</div>
+				</div>
+			</div>
+			<ul class="pagination pull-right">
+				<dir-pagination-controls
+										max-size="5"
+										direction-links="true"
+										boundary-links="true" >
+				</dir-pagination-controls>
+			</ul>
+		</div>
+	</div>
+	<!-- Below modal show the data generated for pdf. -->
+	<modal title="Customer Data" visible="customer_pdf_data_modal">
+		<h3><button type="button" onclick="javascript:generatePDF()" class="btn btn-default btn-xs pull-right" id="create_pdf"><i class="fa fa-file-pdf-o"></i>Generate PDF</button></h3>
+		<div>
+			<table id="customers_pdf" class="table table-striped">
+				<thead>
+					<tr>
+						<th>Customer Name</th>
+						<th>Contact Name</th>
+						<th>Phone Number</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody ng-repeat="customers_data in customer_listing_data | orderBy:sortKey:reverse | filter:search">
+					<tr ng-repeat="customer_contacts in customers_data.contacts | orderBy:'first_name'">
+						<td><span ng-if="$index==0"><b>{{customers_data.name}}</b></span></td>
+						<td>{{customer_contacts.name.title}}&nbsp;{{customer_contacts.name.first_name}}&nbsp;{{customer_contacts.name.last_name}}</td>
+						<td><span ng-if="customer_contacts.phone.length">(+{{customer_contacts.phone[0].calling_code}})&nbsp;{{customer_contacts.phone[0].number}}</span></td>
+						<td>{{customer_contacts.email}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</modal>
+	<!-- Below model will open the form to add the customer. -->
+	<modal title="Add New Customer" visible="add_customer_modal">
+	<div class="bms-form noBorder">
+		<form role="form" ng-submit="addCustomer(addCustomerForm.$valid);" name="addCustomerForm" novalidate>
+			<div class="row">
+				<input type="hidden" ng-model="add_customer.id">
+				<div class="col-xs-12 col-md-12">
+					<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>
+				</div>
+				<div class="col-md-4">
+					<label for="pwd">Customer Type <span style="color:red;">*</span> : <i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="If a customer is an individual and responsible for billing and booking, categorize the customer as Individual. If within a customer there are customer contacts who have different roles like billing or booking or pax only, categorize the customer as Corporate. For Example, ABC Ltd has separate people for looking after billing and booking for passengers travelling for ABC Ltd. Categorize ABC Ltd as a Corporate Customer."></i></label>
+					<label class="select">
+					<select name="customer_type" ng-model="add_customer.customer_type" required>
+						<option value="" selected>Type</option>
+						<option value="corporate">Corporate</option>
+						<option value="individual">Individual</option>
+					</select>
+					<i></i>
+					</label>
+					<div class="error" ng-show="addCustomerForm.customer_type.$touched || customer_type"  ng-messages="addCustomerForm.customer_type.$error">
+						<p ng-message="required">Please select Customer Type</p>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="col-md-6 col-sm-6 col-xs-12">
+					<label for="pwd">Customer Name <span style="color:red;">*</span> :<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="For Individual Customer, please enter the customer name without any salutations. You would still need to add the customer individually as a contact. For Corporate, just add the name of Business, ideally, the name that you would like the invoice to be sent as."></i></label>
+					<label class="input">
+						<input type="text" placeholder="Customer Name" class="form-control" name="name" ng-model="add_customer.name" required>
+					</label>
+					<div class="error" ng-show="addCustomerForm.name.$touched || name"  ng-messages="addCustomerForm.name.$error">
+						<p ng-message="required">Please enter Customer Name</p>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6 col-xs-12">
+					<label for="pwd">Payment Type <span style="color:red;">*</span> :<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="leftBottom" tooltip-template="Collect means when you or your driver would collect the fare as cash or by charging a card. Charge Credit Card means, you have the credit card details of the customer and can charge the card with pre-authorization from the customer. Invoice means, you would send an Invoice or Bill after you have rendered service the customer and have some credit agreement in place. With invoice you will be presented with other sets of options."></i></label>
+					<label class="select">
+						<select name="payment_type" ng-model="add_customer.payment_type" required>
+							<option value="" selected>Type</option>
+							<option value="collect">Collect</option>
+							<option value="credit_card">Charge Credit Card</option>
+							<option value="invoice">Invoice</option>
+						</select>
+						<i></i>
+					</label>
+					<div class="error" ng-show="addCustomerForm.payment_type.$touched || payment_type"  ng-messages="addCustomerForm.payment_type.$error">
+						<p ng-message="required">Please select a type.</p>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="col-md-6 col-sm-6 col-xs-12" ng-show="add_customer.payment_type == 'invoice'">
+					<label for="pwd">Invoice Frequency <span style="color:red;">*</span> :</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-template="The frequency that you want the invoice to  be sent to this customer"></i>
+					<label class="select">
+						<!--<input type="number" class="form-control" name="invoice_frequency" ng-model="add_customer.invoice_frequency">-->
+						<select class="form-control" name="invoice_frequency" ng-model="add_customer.invoice_frequency">
+							<option value="0">0 days</option>
+							<option value="7">7 days</option>
+							<option value="14">14 days</option>
+							<option value="30">1 months</option>
+							<option value="60">2 months</option>
+							<option value="90">3 months</option>
+						</select>
+					</label>
+					<div class="error" ng-show="invoice_frequency_err">
+						<p>Please select frequency.</p>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6 col-xs-12" ng-show="add_customer.payment_type == 'invoice'">
+					<label for="pwd">Invoice Surcharge(%):</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="left" tooltip-template="Invoice means you are giving a credit to your customer. You may want to charge a markup or surcharge for doing this. Surcharge will be calculated on the gross total fare and reflected on the invoice."></i>
+					<label class="select">
+						<!--<input type="number" class="form-control" name="invoice_surcharge_percentage" ng-model="add_customer.invoice_surcharge_percentage">-->
+						<select class="form-control" name="invoice_surcharge_percentage" ng-model="add_customer.invoice_surcharge_percentage">
+							<option value="0">0%</option>
+							<option value="1">1%</option>
+							<option value="2">2%</option>
+							<option value="3">3%</option>
+							<option value="4">4%</option>
+							<option value="5">5%</option>
+							<option value="6">6%</option>
+							<option value="7">7%</option>
+							<option value="8">8%</option>
+							<option value="9">9%</option>
+							<option value="10">10%</option>
+							<option value="11">11%</option>
+							<option value="12">12%</option>
+							<option value="13">13%</option>
+							<option value="14">14%</option>
+							<option value="15">15%</option>
+							<option value="16">16%</option>
+							<option value="17">17%</option>
+							<option value="18">18%</option>
+							<option value="19">19%</option>
+							<option value="20">20%</option>
+							<option value="21">21%</option>
+							<option value="22">22%</option>
+							<option value="23">23%</option>
+							<option value="24">24%</option>
+							<option value="25">25%</option>
+						</select>
+					</label>
+				</div>
+				<div class="clearfix"></div>
+				<div class="col-md-6 col-sm-6 col-xs-12" ng-show="add_customer.payment_type == 'invoice'">
+					<label for="pwd">Invoice Discount(%):</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-template="Discount."></i>
+					<label class="select">
+						<!--<input type="number" class="form-control" name="invoice_discount_percentage" ng-model="add_customer.invoice_discount_percentage">-->
+						<select class="form-control" name="invoice_discount_percentage" ng-model="add_customer.invoice_discount_percentage">
+							<option value="0">0%</option>
+							<option value="1">1%</option>
+							<option value="2">2%</option>
+							<option value="3">3%</option>
+							<option value="4">4%</option>
+							<option value="5">5%</option>
+							<option value="6">6%</option>
+							<option value="7">7%</option>
+							<option value="8">8%</option>
+							<option value="9">9%</option>
+							<option value="10">10%</option>
+							<option value="15">15%</option>
+							<option value="20">20%</option>
+							<option value="25">25%</option>
+							<option value="30">30%</option>
+							<option value="35">35%</option>
+							<option value="40">40%</option>
+							<option value="45">45%</option>
+							<option value="50">50%</option>
+							<option value="55">55%</option>
+							<option value="60">60%</option>
+							<option value="65">65%</option>
+							<option value="70">70%</option>
+							<option value="75">75%</option>
+							<option value="80">80%</option>
+							<option value="85">85%</option>
+							<option value="90">90%</option>
+							<option value="95">95%</option>
+						</select>
+					</label>
+				</div>
+				<div class="col-md-6 col-sm-6 col-xs-12" ng-show="add_customer.payment_type == 'invoice'">
+					<label for="pwd">Include Taxes:</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-template="Include Taxes."></i>
+					<label class="select">
+						<select class="form-control" ng-model="add_customer.include_taxes" name="include_taxes">
+							<option value="within_the_fare">No - Include GST within the Fare</option>
+							<option value="top_of_fare">Yes - Add GST on top of Fare</option>
+						</select>
+					</label>
+				</div>
+				<br/><br/>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>	
+			</div>
+			
+		</form>
+	</div>
+	</modal>
+	<!-- Below model will open the form to edit the customer. -->
+	<modal title="Edit Customer" visible="edit_customer_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="editCustomer(editCustomerForm.$valid);" name="editCustomerForm" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="edit_customer.id">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-4">
+						<label for="pwd">Customer Type <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select name="customer_type" ng-model="edit_customer.type" required><option value="" selected>Type</option><option value="corporate">Corporate</option><option value="individual">Individual</option></select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editCustomerForm.customer_type.$touched || customer_type"  ng-messages="editCustomerForm.customer_type.$error">
+							<p ng-message="required">Please select a type.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-6">
+						<label for="pwd">Customer Name <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" name="name" ng-model="edit_customer.name" required>
+						</label>
+						<div class="error" ng-show="editCustomerForm.name.$touched || name"  ng-messages="editCustomerForm.name.$error">
+							<p ng-message="required">Please enter customer name.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-6">
+						<label for="pwd">Payment Type <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select name="payment_type" ng-model="edit_customer.payment_type" required><option value="" selected>Type</option><option value="collect">Collect</option><option value="credit_card">Charge Credit Card</option><option value="invoice">Invoice</option></select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editCustomerForm.payment_type.$touched || payment_type"  ng-messages="editCustomerForm.payment_type.$error">
+							<p ng-message="required">Please select a type.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-6" ng-show="edit_customer.payment_type == 'invoice'">
+						<label for="pwd">Invoice Frequency <span style="color:red;">*</span> :</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-template="The frequency that you want the invoice to  be sent to this customer"></i>
+						<label class="select">
+							<!--<input type="number" name="invoice_frequency" ng-model="edit_customer.invoice_frequency" >-->
+							<select class="form-control" name="invoice_frequency" ng-model="edit_customer.invoice_frequency">
+								<option value="0">0 days</option>
+								<option value="7">7 days</option>
+								<option value="14">14 days</option>
+								<option value="30">1 months</option>
+								<option value="60">2 months</option>
+								<option value="90">3 months</option>
+							</select>
+						</label>
+						<div class="error" ng-show="invoice_frequency_err">
+							<p>Please select frequency.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-6" ng-show="edit_customer.payment_type == 'invoice'">
+						<label for="pwd">Invoice Surcharge(%):</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="left" tooltip-template="Invoice means you are giving a credit to your customer. You may want to charge a markup or surcharge for doing this. Surcharge will be calculated on the gross total fare and reflected on the invoice."></i>
+						<label class="select">
+							<!--<input type="number" name="invoice_surcharge_percentage" ng-model="edit_customer.invoice_surcharge_percentage" >-->
+							<select class="form-control" name="invoice_surcharge_percentage" ng-model="edit_customer.invoice_surcharge_percentage">
+								<option value="0">0%</option>
+								<option value="1">1%</option>
+								<option value="2">2%</option>
+								<option value="3">3%</option>
+								<option value="4">4%</option>
+								<option value="5">5%</option>
+								<option value="6">6%</option>
+								<option value="7">7%</option>
+								<option value="8">8%</option>
+								<option value="9">9%</option>
+								<option value="10">10%</option>
+								<option value="11">11%</option>
+								<option value="12">12%</option>
+								<option value="13">13%</option>
+								<option value="14">14%</option>
+								<option value="15">15%</option>
+								<option value="16">16%</option>
+								<option value="17">17%</option>
+								<option value="18">18%</option>
+								<option value="19">19%</option>
+								<option value="20">20%</option>
+								<option value="21">21%</option>
+								<option value="22">22%</option>
+								<option value="23">23%</option>
+								<option value="24">24%</option>
+								<option value="25">25%</option>
+							</select>
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-6" ng-show="edit_customer.payment_type == 'invoice'">
+						<label for="pwd">Invoice Discount(%):</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-template="Discount."></i>
+						<label class="select">
+							<!--<input type="number" name="invoice_discount_percentage" ng-model="edit_customer.invoice_discount_percentage" >-->
+							<select class="form-control" name="invoice_discount_percentage" ng-model="edit_customer.invoice_discount_percentage">
+								<option value="0">0%</option>
+								<option value="1">1%</option>
+								<option value="2">2%</option>
+								<option value="3">3%</option>
+								<option value="4">4%</option>
+								<option value="5">5%</option>
+								<option value="6">6%</option>
+								<option value="7">7%</option>
+								<option value="8">8%</option>
+								<option value="9">9%</option>
+								<option value="10">10%</option>
+								<option value="15">15%</option>
+								<option value="20">20%</option>
+								<option value="25">25%</option>
+								<option value="30">30%</option>
+								<option value="35">35%</option>
+								<option value="40">40%</option>
+								<option value="45">45%</option>
+								<option value="50">50%</option>
+								<option value="55">55%</option>
+								<option value="60">60%</option>
+								<option value="65">65%</option>
+								<option value="70">70%</option>
+								<option value="75">75%</option>
+								<option value="80">80%</option>
+								<option value="85">85%</option>
+								<option value="90">90%</option>
+								<option value="95">95%</option>
+							</select>
+						</label>
+					</div>
+					<div class="col-md-6 col-sm-6 col-xs-12" ng-show="edit_customer.payment_type == 'invoice'">
+						<label for="pwd">Include taxes:</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-template="Include Taxes."></i>
+						<label class="select">
+							<select class="form-control" ng-model="edit_customer.include_taxes" name="include_taxes">
+								<option value="within_the_fare">No - Include GST within the Fare</option>
+								<option value="top_of_fare">Yes - Add GST on top of Fare</option>
+							</select>
+						</label>
+					</div>
+					<br/><br/>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+					
+			</form>
+		</div>
+	</modal>
+	<!-- Below model will open the form to add the customer contact. -->
+	<modal title="Add Customer Contact" visible="add_customer_contacts_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="addCustomerContacts(addCustomerContactsForm.$valid);" name="addCustomerContactsForm" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="add_customer_contacts.id">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Contact Type <span style="color:red;">*</span> :</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="Select 'All' if unsure. Specify if Booking or Billing only."></i>
+						<label class="select">
+						<select ng-model="add_customer_contacts.contact_type" name="contact_type" required><option value="" selected>Type</option><option value="billing">Billing</option><option value="booking">Booking</option><option value="pax">Pax</option><option value="all">All</option></select>
+						<i></i>
+						</label>
+						<div class="error" ng-show="addCustomerContactsForm.contact_type.$touched || contact_type"  ng-messages="addCustomerContactsForm.contact_type.$error">
+							<p ng-message="required">Please select contact type.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Title <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="add_customer_contacts.title" name="title" required><option value="" selected>Title</option><option value="Mr">Mr</option><option value="Mrs">Mrs</option><option value="Ms">Ms</option></select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="addCustomerContactsForm.title.$touched || title"  ng-messages="addCustomerContactsForm.title.$error">
+							<p ng-message="required">Please select title.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">First Name <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contacts.first_name" name="first_name" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsForm.first_name.$touched || first_name"  ng-messages="addCustomerContactsForm.first_name.$error">
+							<p ng-message="required">Please enter first name.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Last Name :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contacts.last_name" name="last_name">
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Email :</label>
+						<label class="input">
+							<input type="email" ng-model="add_customer_contacts.email" name="email">
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Password:</label>
+							<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="Password will be used to login."></i>
+						<label class="input">
+							<input type="password" ng-model="add_customer_contacts.password" ng-minlength="6" name="password">
+						</label>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Public Preferences:</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="This would be shown to drivers with whom jobs are shared."></i>
+						<label class="textarea">
+							<textarea  ng-model="add_customer_contacts.public_preferences" ></textarea>
+						</label>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Private Preferences:</label>
+						<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="left" tooltip-template="This would be for only internal reference and can be seen by Admins."></i>
+						<label class="textarea">
+							<textarea ng-model="add_customer_contacts.private_preferences" ></textarea>
+						</label>
+					</div>
+					<br/><br/>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>	
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- Below model will open the form to edit the customer contact. -->
+	<modal title="Edit Customer Contact" visible="edit_customer_contacts_modal">
+		<div class="bms-form noBorder">
+		<form role="form" ng-submit="editCustomerContacts(editCustomerContactsForm.$valid);" name="editCustomerContactsForm" novalidate>
+			<div class="row">
+				<input type="hidden" ng-model="edit_customer_contacts.id">
+				<div class="col-xs-12 col-md-12">
+					<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+						<strong>Error!</strong>&nbsp;{{alert_message_error}}
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Contact Type<span style="color:red;">*</span>:</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="Select 'All' if unsure. Specify if Booking or Billing only."></i>
+					<label class="select">
+						<select ng-model="edit_customer_contacts.contact_type" name="contact_type" required><option value="" selected>Type</option><option value="billing">Billing</option><option value="booking">Booking</option><option value="pax">Pax</option><option value="all">All</option></select>
+						<i></i>
+					</label>
+					<div class="error" ng-show="editCustomerContactsForm.contact_type.$touched || contact_type"  ng-messages="editCustomerContactsForm.contact_type.$error">
+						<p ng-message="required">Please select contact type.</p>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Title<span style="color:red;">*</span>:</label>
+					<label class="select">
+						<select ng-model="edit_customer_contacts.title" name="title" required><option value="" selected>Title</option><option value="Mr">Mr</option><option value="Mrs">Mrs</option><option value="Ms">Ms</option></select>
+					<i></i>
+					</label>
+					<div class="error" ng-show="editCustomerContactsForm.contact_type.$touched || contact_type"  ng-messages="editCustomerContactsForm.contact_type.$error">
+						<p ng-message="required">Please select contact type.</p>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">First Name<span style="color:red;">*</span>:</label>
+					<label class="input">
+						<input type="text" ng-model="edit_customer_contacts.first_name" name="first_name" required>
+					</label>
+					<div class="error" ng-show="editCustomerContactsForm.first_name.$touched || first_name"  ng-messages="editCustomerContactsForm.first_name.$error">
+						<p ng-message="required">Please enter first name.</p>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Last Name:</label>
+					<label class="input">
+						<input type="text" ng-model="edit_customer_contacts.last_name" name="last_name">
+					</label>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">Email:</label>
+					<label class="input">
+						<input type="email" ng-model="edit_customer_contacts.email" name="email">
+					</label>
+				</div>
+				<div class="col-xs-12 col-md-12">
+					<label for="pwd">Password:</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="Password will be used to login."></i>
+					<label class="input">
+						<input type="password" ng-model="edit_customer_contacts.password" ng-minlength="6" name="password">
+					</label>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Public Preferences:</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="right" tooltip-template="This would be shown to drivers with whom jobs are shared."></i>
+					<label class="textarea">
+						<textarea ng-model="edit_customer_contacts.public_preferences" ></textarea>
+					</label>
+				</div>
+				<div class="col-xs-6 col-md-6">
+					<label for="pwd">Private Preferences:</label>
+					<i class="fa fa-question-circle" style="color:#0096db;" tooltips tooltip-side="left" tooltip-template="This would be for only internal reference and can be seen by Admins."></i>
+					<label class="textarea">
+						<textarea ng-model="edit_customer_contacts.private_preferences" ></textarea>
+					</label>
+				</div>
+				<br/><br/>
+				<div class="clearfix"></div>
+				<div class="modal-footer" style="margin-top:10px;">
+					<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+					<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+					<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+				</div>	
+			</div>
+		</form>
+	</div>
+	</modal>
+	<!-- Below model will open the form to add the customer contact phone. -->
+	<modal title="Add Contact Phone" visible="add_customer_contact_phone_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="addCustomerContactPhone(addCustomerContactsForm.$valid);" name="addCustomerContactsForm" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="add_customer_contact_phone.id">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-3">
+						<label for="pwd">Phone Type <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="add_customer_contact_phone.type" name="type" required><option value="" selected>Type</option><option value="work">Work</option><option value="home">Home</option><option value="Mobile">Mobile</option></select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="addCustomerContactsForm.type.$touched || type"  ng-messages="addCustomerContactsForm.type.$error">
+							<p ng-message="required">Please select phone type.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-5">
+						<label for="pwd" >Calling Code <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="add_customer_contact_phone.calling_code" ng-init="add_customer_contact_phone.calling_code=callng_code" name="calling_code" required>
+								<option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}" ng-selected="add_customer_contact_phone.calling_code==country_data.calling_code">{{country_data.name}}(+{{country_data.calling_code}}) </option>
+							</select>
+							<i></i>
+						<label>
+						<div class="error" ng-show="addCustomerContactsForm.calling_code.$touched || calling_code"  ng-messages="addCustomerContactsForm.calling_code.$error">
+							<p ng-message="required">Please select calling code.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-4">
+						<label for="pwd">Phone Number <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_phone.number" ng-minlength="8" ng-maxlength="10" ng-pattern="/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{2,6}$/" name="number" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsForm.number.$touched || number"  ng-messages="addCustomerContactsForm.number.$error">
+							<p ng-message="required">Please enter phone number.</p>
+							<p ng-message="pattern">Enter a valid phone number</p>
+							<p ng-message="maxlength">Enter a valid phone number</p>
+							<p ng-message="minlength">Enter a valid phone number</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>
+				</div>	
+			</form>
+		</div>
+	</modal>
+	<!-- Below model will open the form to edit the customer contact phone. -->
+	<modal title="Edit Contact Phone" visible="edit_customer_contact_phone_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="editCustomerContactPhone(editContactsPhoneForm.$valid);" name="editContactsPhoneForm" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="edit_customer_contact_phone.id">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-3 col-md-3">
+						<label for="pwd">Phone Type <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="edit_customer_contact_phone.type" name="type" required>
+							<option value="" selected>Type</option><option value="work">Work</option><option value="home">Home</option><option value="mobile">Mobile</option></select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editContactsPhoneForm.type.$touched || type"  ng-messages="editContactsPhoneForm.type.$error">
+							<p ng-message="required">Please select phone type.</p>
+						</div>
+					</div>
+					<div class="col-xs-5 col-md-5">
+						<label for="pwd" >Calling Code <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="edit_customer_contact_phone.calling_code" name="calling_code" required>
+								<option value="">Select</option><option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.calling_code}}" ng-selected="edit_customer_contact_phone.calling_code==country_data.calling_code">{{country_data.name}}(+{{country_data.calling_code}}) </option>
+							</select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editContactsPhoneForm.calling_code.$touched || calling_code"  ng-messages="editContactsPhoneForm.calling_code.$error">
+							<p ng-message="required">Please select calling code.</p>
+						</div>
+					</div>
+					<div class="col-xs-4 col-md-4">
+						<label for="pwd">Phone Number <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_phone.number" ng-minlength="8" ng-maxlength="10" ng-pattern="/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{2,6}$/" name="number" required>
+						</label>
+						<div class="error" ng-show="editContactsPhoneForm.number.$touched || number"  ng-messages="editContactsPhoneForm.number.$error">
+							<p ng-message="required">Please enter phone number.</p>
+							<p ng-message="pattern">Enter a valid phone number</p>
+							<p ng-message="maxlength">Enter a valid phone number</p>
+							<p ng-message="minlength">Enter a valid phone number</p>
+						</div>
+					</div>
+					<br/><br/>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>	
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- Below model will open the form to add the customer contact address. -->
+	<modal title="Add Contact Address" visible="add_customer_contact_address_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="addCustomerContactAddress(addCustomerContactsAddrForm.$valid);" name="addCustomerContactsAddrForm" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="add_customer_contact_address.id">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-3 col-md-3">
+						<label for="pwd">Address Type :</label>
+						<label class="select">
+							<select ng-model="add_customer_contact_address.type" name="type"><option value="" selected>Type</option><option value="office">Office</option><option value="home">Home</option><option value="others">Others</option></select>
+							<i></i>
+						</label>
+					</div>
+					<div class="col-xs-9 col-md-9">
+						<label for="pwd">Lable<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.label" name="label" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.label.$touched || label" ng-messages="addCustomerContactsAddrForm.label.$error"> 
+							<p ng-message="required">Please enter lable.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Address Line 1 <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.line_1" name="line_1" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.line_1.$touched || line_1" ng-messages="addCustomerContactsAddrForm.line_1.$error"> 
+							<p ng-message="required">Please enter address line 1.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Address Line 2:</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.line_2" >
+						</label>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Suburb / City <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.city" name="city" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.city.$touched || city" ng-messages="addCustomerContactsAddrForm.city.$error"> 
+							<p ng-message="required">Please enter suburb/city.</p>
+						</div>
+					</div>
+					<!--<div class="col-xs-12 col-md-12">
+						<label for="pwd">Suburb/ District <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.suburb_district" name="suburb_district" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.suburb_district.$touched || suburb_district" ng-messages="addCustomerContactsAddrForm.suburb_district.$error"> 
+							<p ng-message="required">Please enter suburb/district.</p>
+						</div>
+					</div>-->
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">State <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.state" name="state" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.state.$touched || state" ng-messages="addCustomerContactsAddrForm.state.$error"> 
+							<p ng-message="required">Please enter state.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Post Code <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="add_customer_contact_address.post_code" name="post_code" required>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.post_code.$touched || post_code" ng-messages="addCustomerContactsAddrForm.post_code.$error"> 
+							<p ng-message="required">Please enter post code.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Country <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="add_customer_contact_address.country" ng-init="add_customer_contact_address.country=country_name" name="country" required>
+								<option value="">Select</option><option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.name}}" ng-selected="add_customer_contact_address.country==country_data.name">{{country_data.name}}</option>
+							</select>
+						</label>
+						<div class="error" ng-show="addCustomerContactsAddrForm.country.$touched || country" ng-messages="addCustomerContactsAddrForm.country.$error"> 
+							<p ng-message="required">Please enter country.</p>
+						</div>
+					</div>
+					<br/><br/>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">ADD</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">ADD<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- Below model will open the form to add the customer contact address. -->
+	<modal title="Edit Contact Address" visible="edit_customer_contact_address_modal">
+		<div class="bms-form noBorder">
+			<form role="form" ng-submit="editCustomerContactAddress(editContactsAddressForm.$valid);" name="editContactsAddressForm" novalidate>
+				<div class="row">
+					<input type="hidden" ng-model="edit_customer_contact_address.id">
+					<div class="col-xs-12 col-md-12">
+						<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+							<strong>Error!</strong>&nbsp;{{alert_message_error}}
+						</div>
+					</div>
+					<div class="col-xs-3 col-md-3">
+						<label for="pwd">Address Type :</label>
+						<label class="select">
+							<select ng-model="edit_customer_contact_address.type" name="type"><option value="" selected>Type</option><option value="office">Office</option><option value="home">Home</option><option value="others">Others</option></select>
+							<i></i>
+						</label>
+					</div>
+					<div class="col-xs-9 col-md-9">
+						<label for="pwd">Lable<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.label" name="label" required>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.label.$touched || label" ng-messages="editContactsAddressForm.label.$error"> 
+							<p ng-message="required">Please enter label.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Address Line 1 <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.line_1" name="line_1" required>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.line_1.$touched || line_1" ng-messages="editContactsAddressForm.line_1.$error"> 
+							<p ng-message="required">Please enter address line 1.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Address Line 2:</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.line_2" >
+						</label>
+					</div>
+					<div class="col-xs-12 col-md-12">
+						<label for="pwd">Suburb / City<span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.city" name="city" required>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.city.$touched || city" ng-messages="editContactsAddressForm.city.$error"> 
+							<p ng-message="required">Please enter suburb/city.</p>
+						</div>
+					</div>
+					<!--<div class="col-xs-12 col-md-12">
+						<label for="pwd">Suburb/ District <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.suburb_district" name="suburb_district" required>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.suburb_district.$touched || suburb_district" ng-messages="editContactsAddressForm.suburb_district.$error"> 
+							<p ng-message="required">Please enter suburb/district.</p>
+						</div>
+					</div>-->
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">State <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.state" name="state" required>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.state.$touched || state" ng-messages="editContactsAddressForm.state.$error"> 
+							<p ng-message="required">Please enter state.</p>
+						</div>
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<label for="pwd">Post Code <span style="color:red;">*</span> :</label>
+						<label class="input">
+							<input type="text" ng-model="edit_customer_contact_address.post_code" name="post_code" required>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.post_code.$touched || post_code" ng-messages="editContactsAddressForm.post_code.$error"> 
+							<p ng-message="required">Please enter post code.</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-12"> 
+						<label class="select">
+						<label for="pwd">Country <span style="color:red;">*</span> :</label>
+						<label class="select">
+							<select ng-model="edit_customer_contact_address.country" name="country" required>
+								<option value="">Select</option><option ng-repeat="country_data in country_data | orderBy:'name'" value="{{country_data.name}}" ng-selected="edit_customer_contact_address.country==country_data.name">{{country_data.name}}</option>
+							</select>
+							<i></i>
+						</label>
+						<div class="error" ng-show="editContactsAddressForm.country.$touched || country" ng-messages="editContactsAddressForm.country.$error"> 
+							<p ng-message="required">Please enter country.</p>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="modal-footer" style="margin-top:10px;">
+						<button type="submit" class="btn btn-warning btn-xs" data-ng-hide="loading">EDIT</button>
+						<button type="submit" class="btn btn-warning btn-xs" ng-disabled="true" data-ng-show="loading">EDIT<i class="fa fa-cog fa-spin"></i></button>
+						<button type="button" class="btn btn-danger btn-xs large" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</modal>
+	<!-- below model will open the messages. -->
+	<modal visible="success_error_message">
+		<section id="contact-page">
+			<div class="">
+				<div class="alert alert-success" role="alert" ng-if="alert_message_success">
+					<strong>Success!</strong>&nbsp;{{alert_message_success}}
+				</div>
+				<!--<div class="alert alert-danger" role="alert" ng-if="alert_message_error">
+					<strong>Error!</strong>&nbsp;{{alert_message_error}}
+				</div>-->
+			</div>
+		</section>
+	</modal>
+<div class="clearfix"></div>
+</div>
+<script>
+function generatePDF() 
+{
+    var doc = new jsPDF('p', 'pt');
+    doc.text("Customer List", 10, 50);
+	var res = doc.autoTableHtmlToJson(document.getElementById("customers_pdf"));
+	doc.autoTable(res.columns, res.data, {startY: 60,margin: {horizontal: 10},styles: {overflow: 'linebreak'},bodyStyles: {valign: 'top'}});
+	doc.save('customer-data.pdf');
+}
+</script>
