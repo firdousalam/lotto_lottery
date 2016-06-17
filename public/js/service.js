@@ -1,6 +1,6 @@
 angular.module('lottoService.services', [])
     .factory('API', function ( $http) {
-	var base = "http://localhost:3000/";
+	var base = "http://45.55.56.22:3000/";
         return {
 					get_details : function (url) {
 						return $http.get(base+url,
