@@ -1,0 +1,53 @@
+<div class="row list-group">
+  <div class="col-xs-12 col-md-8">
+		<form role="form">
+			<div class="form-group">
+				<label for="email">Email address:</label>
+				<input type="email" class="form-control" id="email">
+			</div>
+			<button type="submit" class="btn btn-info">Submit</button>
+		</form>
+  </div>
+  
+</div>
+<div class="row  list-group">
+  <div class="col-xs-12 col-md-8 page-header">
+	  
+	  	CURRENT JACKPOT
+	 
+  </div>
+  <div class="col-xs-12 col-md-8">
+	  
+  </div>
+  
+</div>
+<div class="row  list-group" ng-controller="rightPanelController">
+	<div class="col-xs-12 col-md-8">
+		<div class="page-header">
+			LATEST WINNING NUMBERS
+			<span style="display:block;" ng-show="show_loader">
+				<div style="position: relative; display:block; margin:0 auto; width: 32px; height: 27px; z-index: 99; background: url(http://www.limokit.com/bms_clients/repo/images/load.gif) center no-repeat; background-size:70%;">
+				</div>
+			</span>	
+		</div>
+		 <div class="span6 pull-right">
+            <p>{{current_jackpot_details.response_data.date | date:'fullDate'}}
+            </p>
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-8">
+        <span ng-repeat="numbers in current_jackpot_details.response_data.jackpot_number" class="numberCircle"> 
+            {{numbers}}
+        </span>
+	</div>
+
+</div>
+<div class="row  list-group">
+	<div class="col-xs-12 col-md-8 page-header">
+		MEMBERSHIPS
+	</div>
+	<div class="col-xs-12 col-md-8">
+		<img ng-src="http://hoosierlotteryhelper.com/wp-content/uploads/2015/09/advance_members-min.jpg" style="width:75%">
+		<img ng-src="http://hoosierlotteryhelper.com/wp-content/uploads/2015/09/Basic-Membership.jpg" style="margin-top:20px;width:75%">
+	</div>
+</div>

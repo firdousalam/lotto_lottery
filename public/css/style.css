@@ -11,3 +11,82 @@
     text-align: center;
     font: 12px Arial, sans-serif;
 }
+.page-header {
+    padding-bottom: 9px;
+    margin: 10px 0 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.footer  {
+   position:fixed;
+   left:0px;
+   bottom:0px;
+   height:80px;
+   width:100%;
+   background-color:#da1331;
+   color: #fff;
+}
+
+.footer a:link, a:visited {
+    color: white;
+    text-align: center; 
+    text-decoration: none;
+    display: inline-block;
+}
+.footer a:hover, a:active {
+    background-color: #fff;
+}
+
+* html .footer {
+   position:absolute;
+   top:expression((0-(footer.offsetHeight)+(document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight)+(ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop))+'px');
+}
+
+.sort-icon {
+    font-size: 9px;
+    margin-left: 5px;
+}
+
+th {
+    cursor:pointer;
+}
+
+.dropbtn {
+    background-color: #000;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    
+    min-width: 120px;
+    
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #da1331;
+}

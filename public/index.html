@@ -9,13 +9,18 @@
     <header ng-include="'templates/header.html'">                    
     </header>
  
-    <div ng-view style="margin-top:80px"></div>
+    <div ng-view style="margin-top:80px;margin-bottom:80px;"></div>
+
+    <div ng-include="'templates/footer.html'" class="footer"></div>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="lib/dirPagination.js"></script>
     <script src="js/app.js"></script>
     <script src="js/home_controller.js"></script>
     <script src="js/service.js"></script>
     <link rel="stylesheet" ng-href="css/style.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.7.0/angular-material-icons.min.js"></script>
     
+
   </body>
 </html>
