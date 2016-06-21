@@ -1,5 +1,6 @@
 var express = require('express'),
     router  = express.Router(),
+    _       = require('underscore');
     fs      = require('fs');
 
 router.route('/')
@@ -21,7 +22,7 @@ router.route('/read_number_of_previous_winner')
 .get(function (req, res) {
   fs.readFile("./winner.txt", "utf8", function (error, data) {
       var winner_numbers              = data.split("\n"),
-        user_provided_numbers           = ["3","5","12","20","24","33"],
+        user_provided_numbers         = ["3","5","12","20","24","33"],
         lottery_result_array          = '',
         total_winning_number          = [],
         total_number_of_draw_drawn        = winner_numbers.length,

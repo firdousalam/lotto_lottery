@@ -32,4 +32,14 @@ angular.module('homeController', ['lottoService.services'])
 		$scope.show_loader =false;
 
 	});
-});
+})
+.controller('jackpotPrediction', function($scope,API)
+{
+	$scope.show_loader =true;
+	API.get_details('winning_prediction_of_user').success(function(data)
+	{
+		$scope.jackpot_prediction_details= data;
+		$scope.show_loader =false;
+
+	});
+})

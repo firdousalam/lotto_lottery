@@ -52,6 +52,10 @@ lottoApp .config(['$routeProvider',
         templateUrl: 'templates/legal.html',
       controller: 'homeController'
       }).
+      when('/jackpot_prediction', {
+        templateUrl: 'templates/jackpot_prediction.html',
+      controller: 'jackpotPrediction'
+      }).
       otherwise({
         redirectTo: '/home'
       });
